@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="George Stagg">
+<meta name="dcterms.date" content="2022-04-03">
+<meta name="description" content="Hacking a Casio CFX-9850G calculator to run custom machine code.">
+
+<title>Dr George W Stagg - Forth on a calculator</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../images/george_stagg.jpg" rel="icon" type="image/jpeg">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/videojs/video.min.js"></script>
+<link href="../../site_libs/quarto-contrib/videojs/video-js.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Dr George W Stagg - Forth on a calculator">
+<meta property="og:description" content="Hacking a Casio CFX-9850G calculator to run custom machine code.">
+<meta property="og:image" content="https://gws.phd/posts/calculator_forth/5.png">
+<meta property="og:site-name" content="Dr George W Stagg">
+<meta property="og:image:height" content="647">
+<meta property="og:image:width" content="680">
+<meta name="twitter:title" content="Dr George W Stagg - Forth on a calculator">
+<meta name="twitter:description" content="Hacking a Casio CFX-9850G calculator to run custom machine code.">
+<meta name="twitter:image" content="https://gws.phd/posts/calculator_forth/5.png">
+<meta name="twitter:creator" content="@gwstagg">
+<meta name="twitter:site" content="@gwstagg">
+<meta name="twitter:image-height" content="647">
+<meta name="twitter:image-width" content="680">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../education.html" rel="" target="">
+ <span class="menu-text">Education</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html" rel="" target="">
+ <span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software.html" rel="" target="">
+ <span class="menu-text">Software &amp; Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
+ <span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/thesis_gws.pdf" rel="" target="">
+ <span class="menu-text">Thesis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/cv.pdf" rel="" target="">
+ <span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Forth on a calculator</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">hacks</div>
+    <div class="quarto-category">retro</div>
+    <div class="quarto-category">hardware</div>
+    <div class="quarto-category">programming</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Hacking a Casio CFX-9850G calculator to run custom machine code.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>George Stagg </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 3, 2022</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>This post was originally published as a <a href="https://twitter.com/gwstagg/status/1510649920042283021">Twitter thread</a>.</p>
+<p><em>Update:</em> Since originally posting this, I’ve seen a video on YouTube discussing colour LCD displays which briefly mentions this family of calculators. <a href="https://www.youtube.com/watch?v=jLew3Dd3IBA">It, along with many other videos on the same channel, is wonderful to watch.</a></p>
+<hr>
+<p>I’m currently suffering with Covid-19. In “celebration”, here is a twitter thread describing my Covid lockdown project: hacking a Casio CFX-9850G calculator, from 1996 with 32KB of RAM and a 128x64 LCD screen, to run custom machine code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="1.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">My CFX-9850G graphing calculator.</figcaption>
+</figure>
+</div>
+<p>Why? It all began when a friend of mine told me he prefers using the dc command over bc, as he is used to using reverse polish notation (RPN) on his calculator. My CFX-9850G, on the other hand, uses the more common infix notation. A comparison is shown here.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The <code>bc</code> and <code>dc</code> CLI calculators.</figcaption>
+</figure>
+</div>
+<p>The CFX-9850G supports programming with Casio BASIC, which suppose I could have used, but it’s <strong>slow</strong>. To do this properly meant learning about how the calculator CPU works and somehow running my own machine code on the thing.</p>
+<p>I tried to learn as much as I could about the hardware. I found a service manual and partial documentation of the calculator’s CPU by Martin Poupe at <a href="http://martin.poupe.org/casio/">http://martin.poupe.org/casio/</a>. This was super helpful and confirmed that it was indeed possible to run custom code.</p>
+<p>I took apart the calculator and removed the ROM chip (a NEC branded 23C400). The plan was to dump the ROM, and then later solder in a new chip programmed with modified data. It took a few attempts to get a clean ROM dump, mostly due to my shoddy soldering. In retrospect, it would have been much easier to just use an <a href="https://www.google.com/search?q=SOIC+adapter">adapter board or ZIF socket/clip</a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="3.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Left: The CFX-9850G’s motherboard, ROM removed. Right: The NEC branded 23C400 SOIC chip, wires soldered to each pin.</figcaption>
+</figure>
+</div>
+<p>I was able to dump the ROM using a universal EEPROM programmer, the <a href="https://www.google.com/search?q=tl866+programmer">widely available MiniPro TL866</a>.</p>
+<p>Now that I had a ROM dump, I could start seeing how the calculator’s built in OS works. Based on Martin’s previous work, I started writing a disassembler for the calculator’s Hitachi HCD62121 so that I could convert the ROM data into readable assembly listings.</p>
+<p>At the same time, I amazingly found a partial implementation of the CPU in MAME’s source code, again based on work by Martin Poupe. Unfortunately, the MAME emulation didn’t work with my ROM, just showing a blank screen or crashing.</p>
+<p>So, I made my own emulator. I used the partially working MAME core as a base, along with Martin’s CPU information and the Casio service manual to understand how the CPU, ROM, display and keypad all work together. The right side of the screen shows the CPU and RAM internals of the machine, along with controls to step through individual instructions, providing a simple debugger.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="4.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The CFX emulator I created as a sandbox for experimentation.</figcaption>
+</figure>
+</div>
+<p>I then used the emulator to watch things as my ROM dump booted, tweaking the emulation until it finally worked. IIRC the problem was due to timing/sleep issues causing the calculator to immediately just turn off. Normally it does that after about 5 minutes to save power!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="5.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Casio’s calculator OS, as dumped from my calculator’s ROM chip, running on the CFX emulator.</figcaption>
+</figure>
+</div>
+<p>With a working emulator I could patch the ROM and test custom machine code. I patched my ROM to replace one of the Casio BASIC commands with a new one. That new command was programmed to jump to a specific location in RAM and then run whatever is there.</p>
+<p>At this point I bought some new blank AT27C040 chips from AliExpress. They are pin-compatible with the ROM chip I pulled from the calculator, and can be programmed with a EEPROM programmer.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="6.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Writing a custom ROM for the calculator using the TL866 programmer. I do wish that board had fit directly into the ZIF socket, so that I could avoid all the wires. Alas, it was slightly too wide.</figcaption>
+</figure>
+</div>
+<p>You’ll notice I’ve also switched from directly soldering to the EEPROM chip to using an adapter board instead. I burned in my patched ROM and soldered the chip back into the calculator. It booted!</p>
+<p>Now, how do we get our new custom machine code into the calculator’s RAM so it can run? Well, back in the day Casio provided software to back up the calculator’s memory. Using this, we can write to RAM!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="7.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">A screenshot of the CASIO FA-122 Program-link software. Copyright 1996 but still runs fine on Windows 10.</figcaption>
+</figure>
+</div>
+<p>It turns out that the backup format is essentially just a hex dump of the calculator’s entire RAM, written in ASCII. So, we can add whatever we like by taking a calculator backup, patching the “data record”, then uploading it back to the calculator.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="8.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The Casio Program-link backup format.</figcaption>
+</figure>
+</div>
+<p>I don’t have the correct Program-link cable to plug into the calculator, but that’s nothing a <a href="https://www.pjrc.com/teensy/">Teensy</a> and 2.5mm jack can’t fix. The calculator communicates with the PC using a serial signal. Here the Teensy is just acting as a RS-232 serial to USB converter.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="9.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">A Teensy 2.0 USB development board and a 2.5mm TRS jack that plugs into the bottom of the calculator.</figcaption>
+</figure>
+</div>
+<p>Writing code for the calculator was a pain. I didn’t want to work with machine code directly, so writing an assembler was the way to go. David Salomon’s <a href="https://t.co/a4RYNFeGEi">Assemblers And Loaders (1993) book</a> was an incredible help with that.</p>
+<p>I wrote a two-pass assembler in C, using <code>flex</code> and <code>bison</code> for lexing and parsing custom assembly code. The assembler produces what I’ve called an <code>out.bin</code> binary object file, which is similar to Unix’s old <code>a.out</code> format, containing the assembled machine code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="10.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption"><code>hcdasm</code>, an assembler for the calculator’s custom CPU.</figcaption>
+</figure>
+</div>
+<p>I also wrote a linking loader that takes multiple <code>out.bin</code> formatted files from the assembler, links and relocates the machine code, sets up a specific entry point in the correct place, and finally builds a new RAM image ready to upload to the calculator.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="11.jpeg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption"><code>hcdld</code>, a linking loader that takes assembled objects and builds a RAM image for the calculator containing executable code.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="12.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Fun fact: As far as I can tell, the calculator’s CPU can’t do multiplication by itself. I had to implement my own integer multiplication algorithm in assembly.</figcaption>
+</figure>
+</div>
+<p>My first assembled program running on the actual hardware (that did anything interesting, anyway) was Conway’s Game of Life. This video was taken just after Conway died 😢 I’ve just checked, the source was 263 lines of assembly. It runs <strong>so much quicker</strong> than Casio BASIC code.</p>
+<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="13.mp4"></video></div>
+<p>Next I made routines for writing text to screen. I store the data for a 4x6 pixel font in RAM, so that I can fit more characters on screen than in the default OS. At this point everything running is my own code, so it’s a bit like writing an OS from scratch.</p>
+<div class="column-body-outset">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="14.jpeg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">“Text rendering” to the calculator’s built in LCD, by writing pixels corresponding to a custom font directly to memory-mapped VRAM.</figcaption>
+</figure>
+</div>
+</div>
+<p>At this point it was time for me to write a RPN interpreter. However, I decided to go a fair step further than that and implement a forth environment for the calculator, which works in RPN style by default. <a href="https://en.wikipedia.org/wiki/Forth_(programming_language)">Forth</a> is a wonderful language. You might think C is bare-bones, but it’s got nothing on forth. You can bootstrap up to an entire interactive programming environment by implementing a surprisingly few number of forth primitives in assembly.</p>
+<p>Jonesforth is a minimal forth interpreter written in i386 assembly. <a href="https://github.com/nornagon/jonesforth/blob/master/jonesforth.S">The source code is written in a literate programming style and is an absolute joy to read from start to finish.</a></p>
+<p>I ported Jonesforth from i386 to the custom assembly code for the calculator. It came out to about 1000 lines of assembly on top of the display code. Some of the code is stored directly as ASCII in RAM, and compiled by the forth compiler on startup!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="15.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The point in the source at which enough assembly primitives are in place that we can start just writing Forth code directly.</figcaption>
+</figure>
+</div>
+<p>And finally, after uploading the assembled forth interpreter to my calculator’s RAM: here is a video showing the result of a calculation that was input using RPN! Apologies for the poor video recording, the calculator screen has dimmed due to age and is extremely hard to film.</p>
+<div class="quarto-video"><video id="video_shortcode_videojs_video2" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="16.mp4"></video></div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<script>videojs(video_shortcode_videojs_video1);</script>
+<script>videojs(video_shortcode_videojs_video2);</script>
+
+
+
+</body></html>

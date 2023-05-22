@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="George Stagg">
+<meta name="dcterms.date" content="2023-03-09">
+<meta name="description" content="WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.">
+
+<title>Dr George W Stagg - WebR 0.1.0 has been released</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../images/george_stagg.jpg" rel="icon" type="image/jpeg">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Dr George W Stagg - WebR 0.1.0 has been released">
+<meta property="og:description" content="WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.">
+<meta property="og:image" content="https://gws.phd/posts/webr_released/thumbnail.jpeg">
+<meta property="og:site-name" content="Dr George W Stagg">
+<meta name="twitter:title" content="Dr George W Stagg - WebR 0.1.0 has been released">
+<meta name="twitter:description" content="WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.">
+<meta name="twitter:image" content="https://gws.phd/posts/webr_released/thumbnail.jpeg">
+<meta name="twitter:creator" content="@gwstagg">
+<meta name="twitter:site" content="@gwstagg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../education.html" rel="" target="">
+ <span class="menu-text">Education</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html" rel="" target="">
+ <span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software.html" rel="" target="">
+ <span class="menu-text">Software &amp; Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
+ <span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/thesis_gws.pdf" rel="" target="">
+ <span class="menu-text">Thesis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/cv.pdf" rel="" target="">
+ <span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">WebR 0.1.0 has been released</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">programming</div>
+    <div class="quarto-category">r</div>
+    <div class="quarto-category">wasm</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>George Stagg </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 9, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+<style>
+  .CodeMirror pre {
+    background-color: unset !important;
+  }
+  .btn-webr {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
+<script type="module">
+  import { WebR } from 'https://webr.r-wasm.org/v0.1.1/webr.mjs';
+  globalThis.webR = new WebR();
+  await globalThis.webR.init();
+  globalThis.webRCodeShelter = await new globalThis.webR.Shelter();
+  document.querySelectorAll(".btn-webr").forEach((btn) => {
+    btn.innerText = 'Run code';
+    btn.disabled = false;
+  });
+</script>
+<p>This post was originally published as an article on the <a href="https://www.tidyverse.org/blog/2023/03/webr-0-1-0/">Tidyverse Blog</a>.</p>
+<p>We’re super excited to announce the release of webR v0.1.0! This is the first release of webR intended for general use by the web development and R communities and is the result of almost a year of hard work by the webR developers.</p>
+<p>This post will introduce webR, demonstrate some of the possibilities that running R in a web browser brings, and give a quick overview of how to include webR in your own TypeScript or JavaScript web applications.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>WebR is a version of the open-source R interpreter compiled for WebAssembly, along with a supporting TypeScript library for interacting with the console and R objects from a JavaScript environment.</p>
+<p>By compiling R to WebAssembly a user can visit a website and run R code directly within the web browser, without R installed on their device or a supporting computational R server. All that is required is a normal web server, including the type of cloud hosting service provided by Github Pages or Netlify.</p>
+</section>
+<section id="how-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-it-works">How it works</h2>
+<p>WebR’s core is based around compiling the open-source R interpreter for <a href="https://webassembly.org">WebAssembly</a>, using the <a href="https://emscripten.org">Emscripten</a> compiler suite along with <a href="https://flang.llvm.org/docs/">LLVM Flang</a> to work with R’s pre-existing C and Fortran based source code.</p>
+<p>WebAssembly (often abbreviated as Wasm) is a standard defining a virtual stack machine along with a corresponding <em>bytecode</em>. Efficient Wasm engines have already been implemented in most modern web browsers, which allows for the deployment of high performance Wasm applications on the web.</p>
+<p>While it’s certainly possible for an interested programmer to write Wasm bytecode by hand, it is not a requirement to do so. Similar to how code and data is compiled into <em>machine code</em> for a certain computer processor, code and data can be compiled into the Wasm bytecode by compiler software that supports the Wasm standard.</p>
+<p>However, unlike with traditional machine code, the Wasm virtual machine (VM) is consistent across multiple different types of environment, architecture, and device – in theory the same bytecode binary can run anywhere without having to be recompiled for that environment. In this way the Wasm VM is similar to Java’s JVM. However, in comparison to the JVM, Wasm has been designed and built from the ground up for use on the modern web, requiring strict sandboxing and security controls.</p>
+<p>Future use for WebAssembly has also been identified in server-side web development, containerisation, cloud computing, and more. With these applications, Wasm has been suggested as a universal binary format of the future. Multiple implementations of the Wasm VM already exist designed to run <em>outside</em> a web browser, through proposed Wasm standards such as <a href="https://wasi.dev">WASI</a>.</p>
+</section>
+<section id="whats-possible" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="whats-possible">What’s possible?</h2>
+<p>Undoubtedly, webR opens a world of possibilities for the interactive use of R and data science on the web.</p>
+<section id="an-online-r-console" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="an-online-r-console">An online R console</h3>
+<p>A web-based interactive R console is included in the webR source repository as a demonstration of integrating webR into a wider web application. A publicly accessible instance of the webR console can be found at <a href="https://webr.r-wasm.org/latest/" class="uri">https://webr.r-wasm.org/latest/</a>.</p>
+<p><a href="webr-repl.png" target="_blank"><img src="webr-repl.png" class="img-fluid" alt="A screenshot showing the demo webR console creating a plot"></a></p>
+<div class="page-columns page-full"><p>With the webR online console a new user can get up and running with R in seconds. The webR console is also functional on many modern mobile devices, where traditional versions of R are not always available for installation at all<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p><div class="no-row-height column-margin column-container"><li id="fn1"><p><sup>1</sup>&nbsp;I am aware of at least one early adopter using webR as a way to access R on their Apple iPad.</p></li></div></div>
+<p>It’s possible to perform data analysis on reasonably large datasets by uploading data to a Virtual File System (VFS). The webR console provides an interface to view and interact with the VFS (<strong>Files</strong> tab, top right). Once a data file has been uploaded to the VFS it can be read by R like any standard file.</p>
+<p><a href="webr-repl2.png" target="_blank"><img src="webr-repl2.png" class="img-fluid" alt="A screenshot showing the demo webR console loading a data file"></a></p>
+<div class="page-columns page-full"><p>Note that uploading and downloading files to the VFS in this way does not actually involve transferring any data over the network. However, webR has been built so that it is possible to load data into webR over the network by using R’s built in functions that can download from URL, such as <code>read.csv()</code><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p><div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup>&nbsp;Note that there are some security measures in place when fetching data that are applied to all web applications. Downloading datasets from URL requires that the web server providing the data supports and allows <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">Cross Origin Resource Sharing (CORS)</a></p></li></div></div>
+<p><a href="webr-repl3.png" target="_blank"><img src="webr-repl3.png" class="img-fluid" alt="A screenshot showing the demo webR console loading a data file from URL"></a></p>
+<p>Plotting is also supported (<strong>Plotting</strong> tab, top right), meaning a user can produce beautiful plot output with the webR console, closing the loop of reading data, performing analysis, and producing output. It is entirely feasible that a casual user could perform the basics of data science entirely within their web browser using webR.</p>
+</section>
+<section id="an-educational-tool" class="level3">
+<h3 class="anchored" data-anchor-id="an-educational-tool">An educational tool</h3>
+<p>Consider the following code block containing some simple R code. After a short loading period while the webR binary and supporting files are downloaded, a <strong>Run code</strong> button is enabled on the code block, with the code itself able to be edited and remixed on the fly. Feel free to try this out now!</p>
+<button class="btn btn-default btn-webr" disabled="" type="button" id="webr-run-button-1">
+Loading webR…
+</button>
+<div id="webr-editor-1">
+
+</div>
+<div id="webr-code-output-1">
+<pre style="visibility: hidden"></pre>
+</div>
+<script type="module">
+  const runButton = document.getElementById('webr-run-button-1');
+  const outputDiv = document.getElementById('webr-code-output-1');
+  const editorDiv = document.getElementById('webr-editor-1');
+
+  const editor = CodeMirror((elt) => {
+    elt.style.border = '1px solid #eee';
+    elt.style.height = 'auto';
+    editorDiv.append(elt);
+  },{
+    value: `fit <- lm(mpg ~ am, data=mtcars)
+summary(fit)`,
+    lineNumbers: true,
+    mode: 'r',
+    theme: 'light default',
+    viewportMargin: Infinity,
+  });
+
+  runButton.onclick = async () => {
+    runButton.disabled = true;
+    let canvas = undefined;
+    await globalThis.webR.init();
+    await webR.evalRVoid('canvas(width=504, height=360)');
+    const result = await webRCodeShelter.captureR(editor.getValue(), {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false,
+      env: webR.objs.emptyEnv,
+    });
+    try {
+      await webR.evalRVoid("dev.off()");
+      const out = result.output.filter(
+        evt => evt.type == 'stdout' || evt.type == 'stderr'
+      ).map((evt) => evt.data).join('\n');
+
+      const msgs = await webR.flush();
+      msgs.forEach(msg => {
+        if (msg.type === 'canvasExec'){
+          if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvas.setAttribute('width', 2 * 504);
+            canvas.setAttribute('height', 2 * 360);
+            canvas.style.width="700px";
+            canvas.style.display="block";
+            canvas.style.margin="auto";
+          }
+          Function(`this.getContext('2d').${msg.data}`).bind(canvas)();
+        }
+      });
+
+      outputDiv.innerHTML = '';
+      const pre = document.createElement("pre");
+      if (/\S/.test(out)) {
+        const code = document.createElement("code");
+        code.innerText = out;
+        pre.appendChild(code);
+      } else {
+        pre.style.visibility = 'hidden';
+      }
+      outputDiv.appendChild(pre);
+
+      if (canvas) {
+        const p = document.createElement("p");
+        p.appendChild(canvas);
+        outputDiv.appendChild(p);
+      }
+    } finally {
+      webRCodeShelter.purge();
+      runButton.disabled = false;
+    }
+  }
+</script>
+<p>After executing the R code once, try changing the <code>am</code> variable in the model to <code>gear</code> and then clicking <strong>Run code</strong> again. You should immediately see how changing the model affects the components of the resulting fit. There is a real R session running and powering this code block – try replacing the entire code with something new!</p>
+<p>The following interactive code block produces an R plot that is directly embedded into the page. As with the previous example, the plot can be recreated or remixed multiple times by the reader simply by clicking the <strong>Run Code</strong> button.</p>
+<button class="btn btn-default btn-webr" disabled="" type="button" id="webr-run-button-2">
+Loading webR…
+</button>
+<div id="webr-editor-2">
+
+</div>
+<div id="webr-code-output-2">
+<pre style="visibility: hidden"></pre>
+</div>
+<script type="module">
+  const runButton = document.getElementById('webr-run-button-2');
+  const outputDiv = document.getElementById('webr-code-output-2');
+  const editorDiv = document.getElementById('webr-editor-2');
+
+  const editor = CodeMirror((elt) => {
+    elt.style.border = '1px solid #eee';
+    elt.style.height = 'auto';
+    editorDiv.append(elt);
+  },{
+    value: `data <- rnorm(1000, 10, 1)
+hist(data, c = rainbow(12))`,
+    lineNumbers: true,
+    mode: 'r',
+    theme: 'light default',
+    viewportMargin: Infinity,
+  });
+
+  runButton.onclick = async () => {
+    runButton.disabled = true;
+    let canvas = undefined;
+    await globalThis.webR.init();
+    await webR.evalRVoid('canvas(width=504, height=360)');
+    const result = await webRCodeShelter.captureR(editor.getValue(), {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false,
+      env: webR.objs.emptyEnv,
+    });
+    try {
+      await webR.evalRVoid("dev.off()");
+      const out = result.output.filter(
+        evt => evt.type == 'stdout' || evt.type == 'stderr'
+      ).map((evt) => evt.data).join('\n');
+
+      const msgs = await webR.flush();
+      msgs.forEach(msg => {
+        if (msg.type === 'canvasExec'){
+          if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvas.setAttribute('width', 2 * 504);
+            canvas.setAttribute('height', 2 * 360);
+            canvas.style.width="700px";
+            canvas.style.display="block";
+            canvas.style.margin="auto";
+          }
+          Function(`this.getContext('2d').${msg.data}`).bind(canvas)();
+        }
+      });
+
+      outputDiv.innerHTML = '';
+      const pre = document.createElement("pre");
+      if (/\S/.test(out)) {
+        const code = document.createElement("code");
+        code.innerText = out;
+        pre.appendChild(code);
+      } else {
+        pre.style.visibility = 'hidden';
+      }
+      outputDiv.appendChild(pre);
+
+      if (canvas) {
+        const p = document.createElement("p");
+        p.appendChild(canvas);
+        outputDiv.appendChild(p);
+      }
+    } finally {
+      webRCodeShelter.purge();
+      runButton.disabled = false;
+    }
+  }
+</script>
+<p>In my experience this way of interacting and experimenting with R code without the mental overhead of context switching from a web browser to an R console, or copying and pasting lines of example code, feels extremely fresh and exciting. An exciting potential application for webR is providing high-quality educational web content in exactly this kind of format.</p>
+</section>
+<section id="reproducible-reports" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="reproducible-reports">Reproducible reports</h3>
+<p>A core principle of good science is that results should be repeatable and reproducible by others. Unfortunately the misuse of data analysis, leading to unreliable results, <a href="https://en.wikipedia.org/wiki/Misuse_of_statistics">is a known issue</a>.</p>
+<p>The idea of a reproducible report is to bring the philosophy of repeatability to the delivery format itself. Reproducible reports weave together explanatory prose, data science, source code, output and figures; all in a single place with a consistent execution environment. With this, a user reading the report has everything they need to reproduce and confirm results for themselves.</p>
+<div class="page-columns page-full"><p>While Jupyter notebooks were not the first implementation of executable documents<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, their popularity has grown over the last decade or so as a way to support high quality reproducible reports. Jupyter has been named <a href="https://www.nature.com/articles/d41586-018-07196-1"><em>“The data scientists’ computational notebook of choice”</em></a> and almost 10 million Jupyter notebooks were publicly accessible on GitHub as of Oct 2020<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</p><div class="no-row-height column-margin column-container"><li id="fn3"><p><sup>3</sup>&nbsp;Knuth originally introduced the precursor <a href="https://en.wikipedia.org/wiki/Literate_programming">Literate Programming</a> paradigm in 1984, and more recently tools such as Sweave, knitr and RMarkdown enable embedding R and computational results directly into a report.</p></li><li id="fn4"><p><sup>4</sup>&nbsp;Admittedly, only a small proportion using an R kernel. <a href="https://blog.jetbrains.com/datalore/2020/12/17/we-downloaded-10-000-000-jupyter-notebooks-from-github-this-is-what-we-learned/">The overwhelming majority use Python, R comes second, and Julia third.</a></p></li></div></div>
+<p>While a Jupyter notebook usually requires a Python and Jupyter installation to fully reproduce results, recent work by the <a href="https://jupyterlite.readthedocs.io/en/latest/">JupyterLite</a> team uses Wasm to bring Jupyter to the web browser. JupyterLite can be used with <a href="https://pyodide.org/en/stable/">Pyodide</a> to run Python based notebooks directly in the browser.</p>
+<p>WebR aims to provide that same experience for Jupyter notebooks based on R. As part of the initial release of webR, we are also releasing a <a href="https://github.com/r-wasm/jupyterlite-webr-kernel">webR kernel for JupyterLite</a>, allowing users to write and execute reproducible Jupyter notebooks for R directly in the web browser.</p>
+<p>A JupyterLite instance with the webR kernel available can be found at <a href="https://jupyter.r-wasm.org/" class="uri">https://jupyter.r-wasm.org/</a>, along with a sample R Jupyter notebook demonstrating a reproducible report.</p>
+<p><a href="jupyter.png" target="_blank"><img src="jupyter.png" class="img-fluid" alt="A screenshot showing the webR JupyterLite kernel"></a></p>
+<p>The JupyterLite kernel for R is still in the early stages of development and <a href="https://github.com/r-wasm/jupyterlite-webr-kernel#limitations">includes some limitations</a>, but the core infrastructure is in place with the release of webR.</p>
+</section>
+<section id="r-packages" class="level3">
+<h3 class="anchored" data-anchor-id="r-packages">R packages</h3>
+<p>R has a rich history of user-created extensions through the use of R packages. Most packages are a combination of R and C or C++ code, and so many packages must be compiled from source for the system they are running on. Unfortunately, it is not possible to install packages in this way in webR. Such an installation process would require an entire C/C++ to WebAssembly compiler toolchain running in the web page!</p>
+<p>For the moment, downloading pre-compiled Wasm binaries is the only supported way to install packages in webR. A pre-installed <code>webr</code> support package provides a helper function <code>webr::install()</code> which can be used to install packages from a CRAN-like repository. As part of the webR release we have provided a small repository of binary R packages compiled for Wasm, publicly hosted with URL <code>https://repo.r-wasm.org/</code>.</p>
+</section>
+</section>
+<section id="using-webr-in-your-own-projects" class="level2">
+<h2 class="anchored" data-anchor-id="using-webr-in-your-own-projects">Using webR in your own projects</h2>
+<p>WebR aims to be as quick and easy to use as possible for those familiar with JavaScript web development. While a short introduction to using webR follows in this blog post, we think the best way to get up and running is by reading the Getting Started section of the <a href="https://docs.r-wasm.org/webr/latest/">webR documentation</a>. The documentation goes into further detail about how to download webR, technical requirements for serving web pages that use webR, and provides more detailed examples.</p>
+<section id="downloading-and-using-webr-from-npm" class="level3">
+<h3 class="anchored" data-anchor-id="downloading-and-using-webr-from-npm">Downloading and using webR from npm</h3>
+<p>For a project with dependencies managed by npm, the <a href="https://www.npmjs.com/package/@r-wasm/webr">webR JavaScript package</a> can be installed by using the command,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> i @r-wasm/webr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Once available, webR can be imported into a project and a new instance of webR initialised with,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { WebR } <span class="im">from</span> <span class="st">'@r-wasm/webr'</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> webR <span class="op">=</span> <span class="kw">new</span> <span class="fu">WebR</span>()<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> webR<span class="op">.</span><span class="fu">init</span>()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Once a new instance of the <code>WebR()</code> class has been created, webR will begin to download WebAssembly binaries from the public CDN, and R will be started.</p>
+</section>
+<section id="downloading-webr-release-packages" class="level3">
+<h3 class="anchored" data-anchor-id="downloading-webr-release-packages">Downloading webR release packages</h3>
+<p>Full release packages for webR can also be downloaded from the webR <a href="https://github.com/r-wasm/webR/releases">GitHub Releases</a> page. The full release packages include the webR JavaScript loader, along with WebAssembly binaries for R and its supporting libraries.</p>
+<p>Hosting a full release package on a web server makes it possible to use webR entirely on your own infrastructure, rather than relying on downloading Wasm binaries from the public CDN.</p>
+</section>
+<section id="an-example-of-executing-r-code" class="level3">
+<h3 class="anchored" data-anchor-id="an-example-of-executing-r-code">An example of executing R code</h3>
+<p>Once R is ready, the JavaScript promise returned by <code>webR.init()</code> will resolve. At this point R code can be evaluated and results converted into JavaScript objects,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalR</span>(<span class="st">'rnorm(10,5,1)'</span>)<span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> output <span class="op">=</span> <span class="cf">await</span> result<span class="op">.</span><span class="fu">toArray</span>()<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(output)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In the above example the <code>result</code> object can be thought of as a reference to a specific R object, and is converted into a standard JavaScript array using the <code>toArray()</code> function.</p>
+<p>Further examples and details of how to interact with the R console and work with R objects can be found in the <a href="https://docs.r-wasm.org/webr/latest/examples.html">webR documentation</a>.</p>
+</section>
+</section>
+<section id="the-future-of-webr" class="level2">
+<h2 class="anchored" data-anchor-id="the-future-of-webr">The future of webR</h2>
+<p>Going forward we plan to expand and improve webR, including compiling more R packages for the webR public package repository. It is our hope that we can provide the same web-based computational infrastructure for R that <a href="https://pyodide.org/en/stable/">Pyodide</a> has provided for the Python ecosystem.</p>
+<p>While WebAssembly engines are in theory able to provide near-native performance, when it comes to the requirements for advanced data science or the deployment of sophisticated machine learning models, the benefits of running tools such as the RStudio IDE natively or a high-performance cloud deployment will likely always outperform the relatively restricted WebAssembly virtual machine. Despite this, webR can provide a smooth, interactive and immediate introduction to the world of working with data in R. Users who have not had the chance to use R in the past due to the barriers raised by the installation of new software to their workstation, or registration for a cloud-based service, might yet still be convinced to introduce R to their workflow though an introduction with interactive examples or short reports powered by webR.</p>
+<p>The opportunity for enhancing educational content also continues beyond introductory materials. Many R packages are documented online, using automated tools such as <a href="https://pkgdown.r-lib.org">pkgdown</a> to produce a dedicated website for the package. Alongside an introductory description, package websites usually also include usage details in the form of example code, reference documentation, and vignette articles. However, if a potential user would like to try the package for themselves, often the only way is by installing the package onto their own machine. Immediately interactive examples, powered by webR, are an interesting future possibility that would reduce this kind of barrier to entry.</p>
+<p>Fairly recently, the Shiny team announced <a href="https://shiny.rstudio.com/py/">Shiny for Python</a>, a feature rich reactive web application framework targeting Python. Of particular note, the team used WebAssembly and Pyodide as a way to run a <a href="https://shiny.rstudio.com/py/docs/shinylive.html">Shinylive</a> server directly in the user’s web browser. One of the most exciting possible applications for webR is a similar architecture targeting the traditional R version of Shiny. Is it possible for a <em>Shinylive for R</em> to be powered by webR? We certainly hope so.</p>
+</section>
+<section id="acknowledgements" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
+<p>A massive thank you to all early webR users for their willingness to experiment and their feedback in the form of GitHub issues and pull requests,</p>
+<p><a href="https://github.com/Anurodhyadav">@Anurodhyadav</a>, <a href="https://github.com/barryrowlingson">@barryrowlingson</a>, <a href="https://github.com/christianp">@christianp</a>, <a href="https://github.com/ekianjo">@ekianjo</a>, <a href="https://github.com/georgestagg">@georgestagg</a>, <a href="https://github.com/HTUser-1">@HTUser-1</a>, <a href="https://github.com/jason-variadiclabs">@jason-variadiclabs</a>, <a href="https://github.com/jjesusfilho">@jjesusfilho</a>, <a href="https://github.com/kdpsingh">@kdpsingh</a>, <a href="https://github.com/lionel-">@lionel-</a>, <a href="https://github.com/psychemedia">@psychemedia</a>, <a href="https://github.com/Sjesc">@Sjesc</a>, <a href="https://github.com/SugarRayLua">@SugarRayLua</a> <a href="https://github.com/unclecode">@unclecode</a>, and <a href="https://github.com/wch">@wch</a>.</p>
+
+
+</section>
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
