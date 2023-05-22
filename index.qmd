@@ -22,4 +22,4 @@ about:
 ---
 
 Open Source Software Engineer @ Posit Software, PBC.\
-Lead Developer of the [webR](https://github.com/r-wasm/webr) project.
+Lead Developer of the [webR](https://docs.r-wasm.org/webr/latest/) project.

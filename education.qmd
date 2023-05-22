@@ -42,7 +42,7 @@ title: "Education"
  * Authenticaiton management with Kerberos & SSSD
  * Storage server management (CIFS/NFS) using Illumos & ZFS
 
-## Digital Learning
+### Digital Learning
  * Assessment in the mathematical sciences
  * Effective computing & software pedagogy
  * Web content delivery & accessibility for mathematical sciences
