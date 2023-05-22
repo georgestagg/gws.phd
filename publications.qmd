@@ -5,45 +5,56 @@ title: "Publications"
 ## Research Articles
 
 **Automatic assessment of mathematical programming exercises with Numbas**\
-*C. Graham, G. Stagg, C. Lawson-Perfect, A. Khan*\
-MSOR Connections **21**, 1 (2023)
+*C. Graham, G. W. Stagg, C. Lawson-Perfect, A. Khan*\
+MSOR Connections **21**, 1 (2023)\
+<https://doi.org/10.21100/msor.v21i1.1395>
 
 **A Prolog assisted search for new simple Lie algebras**\
 *D. Cushing, G. W. Stagg, D. I. Stewart*\
-arXiv:2207.01094 **[math.RA]**, (2022)
+arXiv:2207.01094 **\[math.RA\]**, (2022)\
+<https://doi.org/10.48550/arXiv.2207.01094>
 
 **The Graph Curvature Calculator and the curvatures of cubic graphs**\
 *D. Cushing, R. Kangaslampi, V. Lipiäinen, S. Liu, G. W. Stagg*\
-Experimental Mathematics **31**, 2 (2022)
+Experimental Mathematics **31**, 2 (2022)\
+<https://doi.org/10.1080/10586458.2019.1660740>
 
 **Quasiperiodic boundary conditions for three-dimensional superfluids**\
 *Toby S. Wood, Mae Mesgarnezhad, George W. Stagg, Carlo F. Barenghi*\
-Phys. Rev. B **100**, 024505 (2019)
+Phys. Rev. B **100**, 024505 (2019)\
+<https://doi.org/10.1103/PhysRevB.100.024505>
 
 **Quantum ferrofluid turbulence**\
 *T. Bland, G. W. Stagg, L. Galantucci, A. W. Baggaley, N. G. Parker*\
-Phys. Rev. Lett. **121**, 174501 (2018)
+Phys. Rev. Lett. **121**, 174501 (2018)\
+<https://doi.org/10.1103/PhysRevLett.121.174501>
 
 **Vortex scattering by impurities in a Bose-Einstein condensate**\
 *A. Griffin, G. W. Stagg, N. P. Proukakis and C. F. Barenghi*\
-J. Phys. B: At. Mol. Opt. Phys. **50**, 115003 (2017)
+J. Phys. B: At. Mol. Opt. Phys. **50**, 115003 (2017)\
+<https://doi.org/10.1088/1361-6455/aa6e97>
 
 **Superfluid boundary layer**\
 *G. W. Stagg, N. G. Parker, C. F. Barenghi*\
-Phys. Rev. Lett. **118**, 0135301 (2017)
+Phys. Rev. Lett. **118**, 0135301 (2017)\
+<https://doi.org/10.1103/PhysRevLett.118.135301>
 
 **Ultraquantum turbulence in a quenched homogeneous Bose gas**\
 *G. W. Stagg, N. G. Parker, and C. F. Barenghi*\
-Phys. Rev. A **94**, 053632 (2016)
+Phys. Rev. A **94**, 053632 (2016)\
+<https://doi.org/10.1103/PhysRevA.94.053632>
 
 **Critical velocity for vortex nucleation in a finite-temperature Bose gas**\
 *G. W. Stagg, R. W. Pattinson, C. F. Barenghi, N. G. Parker*\
-Phys. Rev. A **93**, 023640 (2016)
+Phys. Rev. A **93**, 023640 (2016)\
+<https://doi.org/10.1103/PhysRevA.93.023640>
 
 **Generation and Decay of 2D Quantum Turbulence in a Trapped Bose-Einstein Condensate**\
 *G. W. Stagg, A. J. Allen, N. G. Parker, and C. F. Barenghi*\
-Phys. Rev. A **91**, 013612 (2015)
+Phys. Rev. A **91**, 013612 (2015)\
+<https://doi.org/10.1103/PhysRevA.91.013612>
 
 **Quantum analogues of classical wakes in Bose-Einstein condensates**\
 *G. W. Stagg, N. G. Parker and C. F. Barenghi*\
-J Phys B: At. Mol. Opt. Phys. **47**, 095304 (2014)
+J Phys B: At. Mol. Opt. Phys. **47**, 095304 (2014)\
+<https://doi.org/10.1088/0953-4075/47/9/095304>
