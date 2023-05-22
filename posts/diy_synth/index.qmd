@@ -1,0 +1,60 @@
+---
+title: "DIY FM synthesiser"
+description: "Building a DIY FM synthesiser, based on an Yamaha OPL2 and electronic audio kit."
+author: "George Stagg"
+date: "2022/06/22"
+image: "synth.jpeg"
+resources:
+  - 4.mp4
+  - 7.mp4
+  - 8.mp4
+categories:
+  - programming
+  - audio
+  - hardware
+---
+
+This post was originally published as a [Twitter thread](https://twitter.com/gwstagg/status/1540744833484042240).
+
+For anyone looking for an electronics/soldering project I can't recommend [this DIY OPL2 audio board](https://www.tindie.com/products/cheerful/opl2-audio-board/) enough. It comes with everything you need, is very fun to build, does not take too long and when you're done you have an FM synthesiser to play with!
+
+![The OPL2 Audio Board by [Cheerful Electronics](https://www.tindie.com/stores/cheerful/).](1.jpeg)
+
+The OPL2 (aka YM3812) was an FM synthesis chip from Yamaha. It has two oscillators, nine channels and a variety of parameters and effects to play with. It is well known for powering early IBM PC sound cards (e.g Adlib, 1987) and Yamaha's PSR synths (e.g PSR-11/12 1986).
+
+![Above: Adlib sound board. Below: Yamaha PSR-12.](2.jpeg)
+
+Once you've built the OPL2 board, you can hook it up to something like a Raspberry Pi or Arduino to drive it, and synthesise some FM style bleeps and bloops! The board has an audio out jack right there, and has an amplifier so you can plug headphones or speakers in.
+
+Here is an image of the board hooked up to an Arduino Nano clone, a cheap 1.8in TFT screen, and a keypad matrix. Using [Arduino libraries for the board](https://github.com/DhrBaksteen/ArduinoOPL2) and the [TFT screen](https://github.com/arduino-libraries/TFT), I wrote some Arduino code to create a DIY synthesiser.
+
+![OPL2 Audio Board, keypad matrix, Arduino Nano clone, and TFT screen showing an instrument editor screen.](3.jpeg)
+
+Here is a video showing my Instrument Editor. The graphical interface is drawn to the screen using the Arduino TFT library and from there you can use the attached keypad matrix to edit the FM parameters and play notes (using the OPL2 library).
+
+
+:::: {.columns}
+::: {.column width="25%"}
+:::
+::: {.column width="50%"}
+{{< video 4.mp4 >}}
+:::
+::: {.column width="25%"}
+:::
+::::
+
+Although much less developed, here is a Pattern Editor page I never quite finished. The idea here was to create something very similar to old school tracker software, inputting notes for each channel into the pattern editor and playing patterns back to create music.
+
+![The pattern editor screen.](5.jpeg)
+
+Eagle eyed viewers might notice the SD card plugged into the screen. The Arduino uses SPI to talk to everything: the TFT screen, the OPL2 board, and that SD card. The OPL2 instrument parameters and tracker patterns are saved and read back directly to the SD card in this way.
+
+![A closer look at the TFT board, including it's SD card reader slot.](6.png)
+
+Since the OPL2 was used to create sound expansion cards for the IBM PC in the 80s, if you have any old tracker files lying around the OPL2 library can actually play them direct from the SD card. Here is a random one that I found on the web.
+
+{{< video 7.mp4 >}}
+
+And here's a fun version of Popcorn! Apologies for the secondhand recording of the audio rather than direct line-in. The OPL2 sounds amazing in person. Well, if you're into that kind of thing...
+
+{{< video 8.mp4 >}}

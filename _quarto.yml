@@ -1,0 +1,40 @@
+project:
+  type: website
+
+website:
+  favicon: images/george_stagg.jpg
+  open-graph: true
+  twitter-card:
+    creator: "@gwstagg"
+    site: "@gwstagg"
+  site-url: https://gws.phd
+  title: Dr George W Stagg
+  navbar:
+    background: light
+    title: false
+    left:
+      - href: index.qmd
+        text: Home
+      - education.qmd
+      - publications.qmd
+      - software.qmd
+      - posts.qmd
+      - href: docs/thesis_gws.pdf
+        text: Thesis
+      - href: docs/cv.pdf
+        text: CV
+
+format:
+  html:
+    theme: 
+      light:
+       - flatly
+       - custom.scss
+      dark:
+       - darkly
+       - custom.scss
+    css: styles.css
+    reference-location: margin
+
+editor: visual
+

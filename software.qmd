@@ -1,0 +1,169 @@
+---
+title: "Software & Demos"
+---
+
+::: {.column-body-outset .mb-3}
+::: card-group
+::: card
+![](images/webR.png){fig-alt="The webR logo."}
+
+::: card-body
+##### WebR
+
+[The statistical language R compiled into Wasm for use in a browser, via
+Emscripten.]{.card-text}
+
+<a href="https://github.com/r-wasm/webr/" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="https://docs.r-wasm.org/webr/latest/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+
+::: p-2
+:::
+
+::: card
+![](images/gc.png){fig-alt="A screenshot showing the Graph Curvature Calculator software."}
+
+::: card-body
+##### Graph Curvature Calculator
+
+[A web tool for calculating curvature of graphs under various discrete curvature
+notions.]{.card-text}
+
+<a href="https://github.com/georgestagg/graph-curvature-webapp" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="https://www.mas.ncl.ac.uk/graph-curvature/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+:::
+:::
+
+::: {.column-body-outset .mb-3}
+::: card-group
+::: card
+![](images/2dgp.png){fig-alt="Visualisation of output from the 2D-GP software."}
+
+::: card-body
+##### 2D-GP
+
+[A Fortran project that numerically solves the Gross-Pitaevskii Equation in 2D
+using OpenMP.]{.card-text}
+
+<a href="https://github.com/georgestagg/2D-GP" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+:::
+:::
+
+::: p-2
+:::
+
+::: card
+![](images/3dgp.png){fig-alt="Visualisation of output from the 3D-GP-MPIOMP software."}
+
+::: card-body
+##### 3D-GP-MPIOMP
+
+[A Fortran project that numerically solves the Gross-Pitaevskii Equation in 3D
+using MPI and OpenMP.]{.card-text}
+
+<a href="https://github.com/georgestagg/3D-GP-MPIOMP" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+:::
+:::
+:::
+:::
+
+::: {.column-body-outset .mb-3}
+::: card-group
+::: card
+![](images/dsp.png){fig-alt="A screenshot of output from the Double Spherical Pendulum demo."}
+
+::: card-body
+##### Double Spherical Pendulum
+
+[Classical physics simulation of a double pendulum with spherical joints and masses otherwise free to move in 3D.]{.card-text}
+
+<a href="https://github.com/georgestagg/pendulum" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="http://georgestagg.github.io/pendulum/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+
+::: p-2
+:::
+
+::: card
+![](images/webgl_gpe.png){fig-alt="Visualisation of output from the WebGL GPE."}
+
+::: card-body
+##### WebGL GPE
+
+[A WebGL implementation of a 2D Gross-Pitaevskii Equation numerical solver. The solver runs in real time and is directly interactive.]{.card-text}
+
+<a href="https://github.com/georgestagg/webgl_gpe" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="http://georgestagg.github.io/webgl_gpe/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+:::
+:::
+
+::: {.column-body-outset .mb-3}
+::: card-group
+::: card
+![](images/hyper_m.png){fig-alt="A screenshot of output from the Hyperbolic Fractals demo."}
+
+::: card-body
+##### Hyperbolic Fractals
+
+[Defining the Mandelbrot set on a Poincare disc. Includes an interactive hyperbolic fractal explorer.]{.card-text}
+
+<a href="posts/hyperbolic_fractals/index.qmd" class="btn btn-primary"><i class="bi-link"></i> Read Post</a>
+:::
+:::
+
+::: p-2
+:::
+
+::: card
+![](images/primes.png){fig-alt="A screenshot of the Primes! game."}
+
+::: card-body
+##### Primes!
+
+[Tap the tiles to pop out the lowest prime factor. Adjacent primes disappear! Try to clear the board.]{.card-text}
+
+<a href="https://github.com/georgestagg/primes/" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="http://georgestagg.github.io/primes/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+:::
+:::
+
+::: {.column-body-outset .mb-3}
+::: card-group
+::: card
+![](images/dts.png){fig-alt="A screenshot of the Double Torus Snake demo."}
+
+::: card-body
+##### Double Torus Snake
+
+[Snake, but played on a double torus. An experiment in working with Wasm & Emscripten.]{.card-text}
+
+<a href="https://github.com/georgestagg/DTSnake" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="http://georgestagg.github.io/DTSnake/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+
+::: p-2
+:::
+
+::: card
+![](images/tttt.png){fig-alt="A screenshot of the Tensor Tic Tac Toe game."}
+
+::: card-body
+##### Tensor Tic Tac Toe
+
+[A meta-game based on Tic Tac Toe. The meta-game is made up of 9 smaller games of Tic Tac Toe.]{.card-text}
+
+<a href="https://github.com/georgestagg/tensortictactoe" class="btn btn-primary"><i class="bi-github"></i> GitHub</a>
+<a href="http://georgestagg.github.io/tensortictactoe/" class="btn btn-primary"><i class="bi-link"></i> Website</a>
+:::
+:::
+:::
+:::

@@ -1,0 +1,48 @@
+---
+title: "Education"
+---
+
+## Qualifications
+
+### PhD in Mathematics (2016)
+**Newcastle University**
+
+**Thesis:** *A Numerical Study of Vortices and Turbulence in Quantum Fluids*\
+**Supervisors:** Prof. Carlo Barenghi & Prof. Nick Parker
+
+### MMath in Mathematics --- First Class Honours (2012)
+**Newcastle University**
+
+**Dissertation:** *The Movement of a Fractal Through a Bose-Einstein Condensate*\
+**Supervisor:** Prof. Carlo Barenghi
+
+## Teaching Experience
+
+### Newcastle University --- School of Mathematics & Statistics
+ * PHY1030: Introduction to Python for Laboratory Physics (2020--2022)
+ * MAS2502: Introduction to Computing and Problem Solving (2018--2020)
+ * Mathematical Typesetting with $\mathrm\LaTeX$ (2016--2021)
+ * Introduction to R & MATLAB (2016--2021)
+ * Introduction to Linux (2018--2020)
+
+## Research Experience
+
+### Theoretical Physics
+ * Superfluidity & quantum turbulence
+ * Vortex fluid dynamics
+ * Ultra-cold gasses & Bose-Einstein condensation
+
+### Computational Mathematics
+ * Discrete graph curvature
+ * Finite-characteristic Lie algebras
+
+### Research Software Engineering
+ * HPC software engineering & system administration
+ * Large scale parallel computing with MPI & OpenMP
+ * Authenticaiton management with Kerberos & SSSD
+ * Storage server management (CIFS/NFS) using Illumos & ZFS
+
+## Digital Learning
+ * Assessment in the mathematical sciences
+ * Effective computing & software pedagogy
+ * Web content delivery & accessibility for mathematical sciences

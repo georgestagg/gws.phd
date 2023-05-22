@@ -1,0 +1,30 @@
+---
+title: "An R grammar experiment"
+description: "Hacking at R's grammar so as to allow for JSX-style XML tags."
+author: "George Stagg"
+date: "2023/02/07"
+image: "2.png"
+categories:
+  - hacks
+  - r
+  - programming
+---
+
+
+This post was originally published as a [Twitter thread](https://twitter.com/gwstagg/status/1622933223683547138).
+
+Recently I was travelling on a plane without WiFi and so I decided to play with the R source code, which I already had on my laptop. I started experimenting with the file `src/main/gram.y`, which defines R's language syntax using rules listed in a variant of Backus-Naur Form.
+
+I added some new rules to the grammar that adds a different way to invoke R functions. The new syntax looks like XML, and it feels *really* weird to use functions in this way.
+
+![Invoking functions in the style of XML tags.](1.png)
+
+I set it up so that multiple arguments are space separated child nodes, and named arguments can be added as XML attributes. So, functions with multiple arguments can still be invoked using this strange method. I also made it so R expressions wrapped in curly braces are evaluated.
+
+![Nested function invocation and named arguments.](2.png)
+
+Why was I creating this monster? Well, I was thinking of JSX - a fun extension to JavaScript that allows you to manipulate XML components directly in the JSX source. With this hack, you can almost do the same thing with Shiny and write the UI in HTML. Kinda neat, right?
+
+![A Shiny app, written in a JSX-style using this grammar hack.](3.jpeg)
+
+So, is this useful in any way? No, probably not. The hack is direct to the R source and I doubt R packages could make this kind of change. So even if you *really* wanted to do it, you'd have to run a patched version of R. A fun little experiment in writing BNF rules, though.

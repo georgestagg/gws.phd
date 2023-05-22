@@ -1,0 +1,49 @@
+---
+title: "Publications"
+---
+
+## Research Articles
+
+**Automatic assessment of mathematical programming exercises with Numbas**\
+*C. Graham, G. Stagg, C. Lawson-Perfect, A. Khan*\
+MSOR Connections **21**, 1 (2023)
+
+**A Prolog assisted search for new simple Lie algebras**\
+*D. Cushing, G. W. Stagg, D. I. Stewart*\
+arXiv:2207.01094 **[math.RA]**, (2022)
+
+**The Graph Curvature Calculator and the curvatures of cubic graphs**\
+*D. Cushing, R. Kangaslampi, V. Lipiäinen, S. Liu, G. W. Stagg*\
+Experimental Mathematics **31**, 2 (2022)
+
+**Quasiperiodic boundary conditions for three-dimensional superfluids**\
+*Toby S. Wood, Mae Mesgarnezhad, George W. Stagg, Carlo F. Barenghi*\
+Phys. Rev. B **100**, 024505 (2019)
+
+**Quantum ferrofluid turbulence**\
+*T. Bland, G. W. Stagg, L. Galantucci, A. W. Baggaley, N. G. Parker*\
+Phys. Rev. Lett. **121**, 174501 (2018)
+
+**Vortex scattering by impurities in a Bose-Einstein condensate**\
+*A. Griffin, G. W. Stagg, N. P. Proukakis and C. F. Barenghi*\
+J. Phys. B: At. Mol. Opt. Phys. **50**, 115003 (2017)
+
+**Superfluid boundary layer**\
+*G. W. Stagg, N. G. Parker, C. F. Barenghi*\
+Phys. Rev. Lett. **118**, 0135301 (2017)
+
+**Ultraquantum turbulence in a quenched homogeneous Bose gas**\
+*G. W. Stagg, N. G. Parker, and C. F. Barenghi*\
+Phys. Rev. A **94**, 053632 (2016)
+
+**Critical velocity for vortex nucleation in a finite-temperature Bose gas**\
+*G. W. Stagg, R. W. Pattinson, C. F. Barenghi, N. G. Parker*\
+Phys. Rev. A **93**, 023640 (2016)
+
+**Generation and Decay of 2D Quantum Turbulence in a Trapped Bose-Einstein Condensate**\
+*G. W. Stagg, A. J. Allen, N. G. Parker, and C. F. Barenghi*\
+Phys. Rev. A **91**, 013612 (2015)
+
+**Quantum analogues of classical wakes in Bose-Einstein condensates**\
+*G. W. Stagg, N. G. Parker and C. F. Barenghi*\
+J Phys B: At. Mol. Opt. Phys. **47**, 095304 (2014)
