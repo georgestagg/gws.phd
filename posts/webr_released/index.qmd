@@ -12,6 +12,7 @@ categories:
   - programming
   - r
   - wasm
+  - webr
 ---
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
