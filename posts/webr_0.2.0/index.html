@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="George Stagg">
+<meta name="dcterms.date" content="2023-08-16">
+<meta name="description" content="WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.">
+
+<title>Dr George W Stagg - WebR 0.2.0 has been released</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../images/george_stagg.jpg" rel="icon" type="image/jpeg">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Dr George W Stagg - WebR 0.2.0 has been released">
+<meta property="og:description" content="WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.">
+<meta property="og:image" content="https://gws.phd/posts/webr_0.2.0/thumbnail.jpeg">
+<meta property="og:site-name" content="Dr George W Stagg">
+<meta name="twitter:title" content="Dr George W Stagg - WebR 0.2.0 has been released">
+<meta name="twitter:description" content="WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.">
+<meta name="twitter:image" content="https://gws.phd/posts/webr_0.2.0/thumbnail.jpeg">
+<meta name="twitter:creator" content="@gwstagg">
+<meta name="twitter:site" content="@gwstagg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../education.html" rel="" target="">
+ <span class="menu-text">Education</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html" rel="" target="">
+ <span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software.html" rel="" target="">
+ <span class="menu-text">Software &amp; Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
+ <span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/thesis_gws.pdf" rel="" target="">
+ <span class="menu-text">Thesis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/cv.pdf" rel="" target="">
+ <span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">WebR 0.2.0 has been released</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">programming</div>
+    <div class="quarto-category">r</div>
+    <div class="quarto-category">wasm</div>
+    <div class="quarto-category">webr</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>George Stagg </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 16, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+<style>
+  .CodeMirror pre {
+    background-color: unset !important;
+  }
+  .btn-webr {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
+<script type="module">
+  import { WebR, ChannelType } from 'https://webr.r-wasm.org/v0.2.1/webr.mjs';
+  globalThis.webR = new WebR({
+    channelType: ChannelType.PostMessage,
+  });
+  await globalThis.webR.init();
+  globalThis.webRCodeShelter = await new globalThis.webR.Shelter();
+  document.querySelectorAll(".btn-webr").forEach((btn) => {
+    btn.innerText = 'Run code';
+    btn.disabled = false;
+  });
+</script>
+<p>This post was originally published as an article on the <a href="https://www.tidyverse.org/blog/2023/08/webr-0-2-0/">Tidyverse Blog</a>.</p>
+<p>We’re absolutely thrilled to announce the release of <a href="https://docs.r-wasm.org/webr/v0.2.0/">webR</a> 0.2.0! This release gathers together many updates and improvements to webR over the last few months, including improvements to the HTML canvas graphics device, support for Cairo-based bitmap graphics, accessibility and internationalisation improvements, additional Wasm R package support (including Shiny), a new webR REPL app, and various updates to the webR developer API.</p>
+<p>This blog post will take a deep dive through the major breaking changes and new features available in webR 0.2.0.</p>
+<section id="webassembly-and-webr" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="webassembly-and-webr">WebAssembly and webR</h2>
+<div class="page-columns page-full"><p>My previous <a href="https://www.tidyverse.org/blog/2023/03/webr-0-1-0/">webR release blog post</a> goes into detail about what WebAssembly is, why people are excited about it, and how it relates to the R community and ecosystem in general through webR. I would recommend it as a good place to start, if the project is new to you<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p><div class="no-row-height column-margin column-container"><li id="fn1"><p><sup>1</sup>&nbsp;In addition, <a href="https://blog.djnavarro.net/posts/2023-04-09_webr/">Danielle Navarro’s webR blog post</a> is very good and Bob Rudis’s <a href="https://rud.is/webr-experiments/">webR experiments</a> are well worth exploring, along with his recent <a href="https://youtu.be/inpwcTUmBDY">NY R conference talk</a>.</p></li></div></div>
+<div class="page-columns page-full"><p>A short explanation is that WebAssembly (also known as Wasm) allows software that’s normally compiled for a specific computer system to instead run anywhere, including in web browsers. Wasm is the technology that powers <a href="https://pyodide.org">Pyodide</a> (used by <a href="https://shiny.rstudio.com/py/docs/shinylive.html">Shinylive for Python</a>) and webR brings this technology to the R world. Using webR it is possible to run R code directly in a web browser<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, without the need for the traditional supporting R server to execute the code.</p><div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup>&nbsp;Also other JavaScript/Wasm environments, such as Node.js. For example, <a href="https://ropensci.org/r-universe/">ROpenSci’s r-universe</a> package platform provides download links for datasets contained in R packages, in a variety of formats, <a href="https://fosstodon.org/@jeroenooms/110299179903212170">powered by running webR server-side in Node.js</a>.</p></li></div></div>
+<p>Running R code directly in a browser opens the door for many new and exciting uses for R on the web. Applications that I’m personally excited in seeing developed are,</p>
+<ul>
+<li>Live and interactive R code and graphics in documents &amp; presentations,</li>
+<li>Tactile educational content for R, with examples that can be remixed on-the-fly by learners,</li>
+<li>Reproducible statistics through containerisation and notebook-style literate programming.</li>
+</ul>
+<p>Even in these early days, some of this is already being provided by development of downstream projects such as James Balamuta’s <a href="https://github.com/coatless/quarto-webr">quarto-webr</a> extension, allowing Quarto users to easily embed interactive R code blocks in their documents.</p>
+<section id="interactive-code-blocks" class="level3">
+<h3 class="anchored" data-anchor-id="interactive-code-blocks">Interactive code blocks</h3>
+<p>One of my favourite demonstrations of what webR can do is interactive code blocks for R code. After a short loading period while the webR binary is downloaded, a <strong>Run code</strong> button will be enabled below. Using examples like this, R code can be immediately edited and executed – feel free to experiment! Click the “Run code” button to see the resulting box plot, change the colour from <code>mediumseagreen</code> to <code>red</code> and run the code again.</p>
+<button class="btn btn-default btn-webr" disabled="" type="button" id="webr-run-button-1">
+Loading webR…
+</button>
+<div id="webr-editor-1">
+
+</div>
+<div id="webr-code-output-1">
+<pre style="visibility: hidden"></pre>
+</div>
+<script type="module">
+  const runButton = document.getElementById('webr-run-button-1');
+  const outputDiv = document.getElementById('webr-code-output-1');
+  const editorDiv = document.getElementById('webr-editor-1');
+
+  const editor = CodeMirror((elt) => {
+    elt.style.border = '1px solid #eee';
+    elt.style.height = 'auto';
+    editorDiv.append(elt);
+  },{
+    value: `colnames(mtcars)\n\nboxplot(\n  mpg ~ cyl, data = mtcars,\n  col = "mediumseagreen",\n  xlab = "Number of Cylinders",\n  ylab = "Miles/(US) gallon",\n  main = "Motor Trend Car Road Tests",\n  sub = "Source: 1974 Motor Trend US magazine"\n)`,
+    lineNumbers: true,
+    mode: 'r',
+    theme: 'light default',
+    viewportMargin: Infinity,
+  });
+
+  runButton.onclick = async () => {
+    runButton.disabled = true;
+    let canvas = undefined;
+    await globalThis.webR.init();
+    await webR.evalRVoid('webr::canvas(width=504, height=360)');
+    const result = await webRCodeShelter.captureR(editor.getValue(), {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false,
+      env: webR.objs.emptyEnv,
+    });
+    try {
+      await webR.evalRVoid("dev.off()");
+      const out = result.output.filter(
+        evt => evt.type == 'stdout' || evt.type == 'stderr'
+      ).map((evt) => evt.data).join('\n');
+
+      const msgs = await webR.flush();
+      msgs.forEach(msg => {
+        if (msg.type === 'canvas' && msg.data.event === 'canvasImage'){
+          if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvas.setAttribute('width', 2 * 504);
+            canvas.setAttribute('height', 2 * 360);
+            canvas.style.width="700px";
+            canvas.style.display="block";
+            canvas.style.margin="auto";
+          }
+          canvas.getContext('2d').drawImage(msg.data.image, 0,0,canvas.width,canvas.height)
+        }
+      });
+
+      outputDiv.innerHTML = '';
+      const pre = document.createElement("pre");
+      if (/\S/.test(out)) {
+        const code = document.createElement("code");
+        code.innerText = out;
+        pre.appendChild(code);
+      } else {
+        pre.style.visibility = 'hidden';
+      }
+      outputDiv.appendChild(pre);
+
+      if (canvas) {
+        const p = document.createElement("p");
+        p.appendChild(canvas);
+        outputDiv.appendChild(p);
+      }
+    } finally {
+      webRCodeShelter.purge();
+      runButton.disabled = false;
+    }
+  }
+</script>
+<p>It’s easy to see the potential teaching benefit examples like this could bring to educational content or R package documentation.</p>
+</section>
+</section>
+<section id="the-webr-repl-app" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-webr-repl-app">The webR REPL app</h2>
+<div class="page-columns page-full"><p>WebR can be loaded into a web page to be used as a part of a wider web application, and ships with a demo application that does just that. The webR REPL app<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> provides a simple R environment directly in your web browser. The app can be accessed at <a href="https://webr.r-wasm.org/v0.2.0/" class="uri">https://webr.r-wasm.org/v0.2.0/</a> and includes sections for R console input/output, code editing, file management, and graphics device output.</p><div class="no-row-height column-margin column-container"><li id="fn3"><p><sup>3</sup>&nbsp;REPL stands for “Read, Eval, Print, Loop”, and is another name for the R console that you’re probably familiar with. The application is named the “webR REPL app” because the original version simply provided the user with a fullscreen R console in their web browser.</p></li></div></div>
+<p>With the webR REPL app, a casual user could get up and running with R in seconds, without having to install any software on their machine. It is entirely feasible that they could perform the basics of data science entirely within their web browser!</p>
+<p>Other than interactive code blocks, like in the example earlier, the webR REPL app is perhaps the first thing that users new to webR will interact with. For this reason, we have spent some time working to improve the technical implementation and user experience of using the app. The app has been completely rewritten in the React web framework, replacing the older jQuery library. This allows for better component code organisation and more rapid development of features and updates.</p>
+<p><a href="repl.png"><img alt="A screenshot the webR REPL app. The code to generate a ggplot, along with its output, is shown in the app." width="95%" src="repl.png"></a></p>
+<section id="code-editor" class="level3">
+<h3 class="anchored" data-anchor-id="code-editor">Code editor</h3>
+<p>The app now comes with a tabbed code editor, allowing for easier editing and execution of R code. The editor integrates with the webR virtual filesystem (VFS), meaning that multiple R scripts can be opened, edited, and saved and they will be available to the running Wasm R process.</p>
+<p>The editor pane is built upon the excellent <a href="https://codemirror.net">CodeMirror</a> text editor, which provides most of the component’s functionality. CodeMirror provides built-in support for syntax highlighting of R code, which is enabled by default when R source files are displayed.</p>
+<p>The editor is integrated with the currently running R process and automatic code suggestions are shown as you type, provided by R’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/rcompgen.html">built in completion generator</a>. The suggestions are context sensitive and are aware of package and function names, valid arguments, and even objects that exist in the global environment.</p>
+<p><a href="completion.png"><img alt="A screenshot of the editor component showing code completion results. One of the suggestions is a data set available in the global environment." width="70%" src="completion.png"></a></p>
+<p>The running Wasm R process is also configured at initialisation to use the editor component as its display <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/file.show.html">pager mechanism</a>. With this configuration in place running commands such as <a href="https://rdrr.io/r/stats/Normal.html"><code>?rnorm</code></a> in the app automatically opens a new read-only tab in the editor displaying R’s built-in documentation.</p>
+<p><a href="documentation.png"><img alt="A screenshot of the editor component showing built-in R documentation" width="80%" src="documentation.png"></a></p>
+</section>
+<section id="plotting-pane" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-pane">Plotting pane</h3>
+<p>The plotting pane has been updated to take advantage of improvements in webR’s HTML canvas graphics device, set as the default device as part of initialisation. In particular, multiple plots are now supported and older plots can be directly accessed using the previous and next buttons in the plotting toolbar. You can try this out with R’s built in graphics demo, by running <code>demo(graphics)</code> and/or <code>demo(persp)</code>.</p>
+<p><a href="plotting.png"><img alt="A screenshot of the plot pane showing a built-in R graphics demo" width="75%" src="plotting.png"></a></p>
+</section>
+<section id="files-pane" class="level3">
+<h3 class="anchored" data-anchor-id="files-pane">Files pane</h3>
+<p>The files pane has been completely redesigned, removing its dependency on jQuery and instead making use of the <a href="https://www.npmjs.com/package/react-accessible-treeview">react-accessible-treeview</a> package. As well as a technical improvement, this change means that interacting with the webR filesystem should be more usable to those with web accessibility requirements. We feel it’s important that, where possible, everybody is able to use our software.</p>
+<p><a href="files.png"><img alt="A screenshot of the files pane showing the path /home/web_user/plot_random_numbers.R" width="90%" src="files.png"></a></p>
+<p>Additional buttons have also been added to this pane, allowing users to easily manipulate the virtual file system visible to the running Wasm R process. New files and directories can be created or deleted, and text-based files can be directly opened and modified in the editor pane, removing the need to download, edit and then re-upload files.</p>
+</section>
+<section id="console-pane" class="level3">
+<h3 class="anchored" data-anchor-id="console-pane">Console pane</h3>
+<p>The R console component shown in the lower left portion of the app is powered by the wonderful <a href="https://xtermjs.org">xterm.js</a> software, which provides a high performance terminal emulator on the web. R output looks at its best when running in this kind of environment, so that <a href="https://en.wikipedia.org/wiki/ANSI_escape_code">ANSI escape codes</a> can be used to provide a much smoother console experience incorporating cursor placement, box drawing characters, bold text, terminal colours, and more.</p>
+<p><a href="term.png"><img alt="An example of ANSI escape sequences in R console output while loading the tidyverse package." width="90%" src="term.png"></a></p>
+<p>An optional accessibility mode is provided by xterm.js so that terminal output is readable by screen reader software, such as <a href="https://support.apple.com/en-gb/guide/voiceover/welcome/mac">macOS’s VoiceOver</a>. The webR REPL app now enables this mode by default to improve the accessibility of terminal output.</p>
+</section>
+</section>
+<section id="html-canvas-graphics-device" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="html-canvas-graphics-device">HTML Canvas graphics device</h2>
+<p>The webR support package provides a custom <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a> graphics device that renders output using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API">Web Canvas API</a>. When the graphics device is used, drawing commands from R are translated into Canvas API calls. The browser renders the graphics and the resulting image data is drawn to a HTML <code>&lt;canvas&gt;</code> element on the page.</p>
+<p>With the release of webR 0.2.0, we have improved the performance and added new features to the HTML canvas graphics device.</p>
+<section id="performance-improvements-with-offscreencanvas" class="level3">
+<h3 class="anchored" data-anchor-id="performance-improvements-with-offscreencanvas">Performance improvements with <code>OffscreenCanvas</code></h3>
+<p>Using the Canvas API to draw graphics in a browser is elegant, but presents a problem. R is running via WebAssembly in a JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers">Web Worker</a> thread, but the <code>&lt;canvas&gt;</code> element the plot image data is written to is on the main thread, part of the web page <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction">DOM</a>. And, unfortunately, JavaScript Web Worker threads have no direct access to the DOM.</p>
+<p>Previous releases of webR solve this problem in a rather naive way, it simply sends the Canvas API calls to the main thread to be executed there. This leads to a few issues,</p>
+<ul>
+<li><p>Canvas API calls are serialised as text to be sent to the main thread. Sufficiently complex plot text must therefore be quoted and escaped.</p></li>
+<li><p>Each API call is sent in a separate message. For a complex plot this can be thousands of messages to dispatch and handle.</p></li>
+<li><p>The messaging is one-way, results of useful methods like <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/measureText"><code>measureText()</code></a> cannot easily be retrieved.</p></li>
+<li><p>Parsing and executing the API call on the main thread means using JavaScript’s <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval"><code>eval()</code></a> or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function"><code>Function()</code></a>, leading to poor performance. These functions should also be avoided when possible in any case, for security reasons.</p></li>
+</ul>
+<p>Solid engineering efforts could be made to improve the situation, e.g.&nbsp;through batching API calls and better encoding, but there is a better way: the <a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code>OffscreenCanvas</code></a> interface. <code>OffscreenCanvas</code> is designed to solve this exact problem of rendering graphics off-screen, such as in a worker thread. With <code>OffscreenCanvas</code> the Canvas API calls can all be executed on the worker thread, and only a single message containing the completed image data transferred to the main thread when rendering is complete. It is an efficient and technically satisfying solution, except that when webR 0.1.1 was released <code>OffscreenCanvas</code> wasn’t supported by the Safari web browser.</p>
+<p>Today, on the other hand, <code>OffscreenCanvas</code> is <a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas#browser_compatibility">supported</a> in all major desktop and mobile browsers. Safari has supported it since version 16.4, and so with webR 0.2.0 we have rewritten the <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a> graphics device to take full advantage of the <code>OffscreenCanvas</code> interface. This has led to a significant performance improvement, particularly when creating plots containing many points. The two videos below show the same plot rendered in webR 0.1.1 and 0.2.0, the difference is not just visible, but an order of magnitude faster.</p>
+<video controls="" loop="" width="100%" src="plot.mp4" style="border: 2px solid #CCC;">
+<source src="plot.mp4">
+</video>
+<div style="text-align: center; font-weight: bold;">
+<p>A performance comparison plotting 300000 points in webR 0.1.1 and 0.2.0.</p>
+</div>
+<p>A potential downside is that users of less up-to-date browsers without <code>OffscreenCanvas</code> support won’t be able to use the <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a> graphics device. Such users should instead make use of our additional updates to webR to support the traditional Cairo-based bitmap devices. The <a href="#built-in-bitmap-graphics-devices">built-in graphics devices section</a> discusses that in more detail.</p>
+</section>
+<section id="modern-text-rendering-and-internationalisation" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="modern-text-rendering-and-internationalisation">Modern text rendering and internationalisation</h3>
+<p>With webR 0.1.1, the canvas graphics device had only minimal support for rendering text. The typeface was fixed, the font metrics were estimated with a heuristic, and Unicode characters outside the Basic Latin block often failed to render. It worked most of the time, but it was far from ideal. This area of software engineering is <a href="https://faultlore.com/blah/text-hates-you/">suprisingly difficult</a> to get right, and even native installations of R can have <a href="https://www.tidyverse.org/blog/2021/02/modern-text-features/">serious text rendering issues</a>.</p>
+<p>In comparison, web browser support for text rendering is excellent. Now that we use the <code>OffscreenCanvas</code> interface, we too can take advantage of the years of work behind browser’s support for text on the web. The example below demonstrates several of the modern text rendering features now supported by <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a>.</p>
+<button class="btn btn-default btn-webr" disabled="" type="button" id="webr-run-button-2">
+Loading webR…
+</button>
+<div id="webr-editor-2">
+
+</div>
+<div id="webr-code-output-2">
+<pre style="visibility: hidden"></pre>
+</div>
+<script type="module">
+  const runButton = document.getElementById('webr-run-button-2');
+  const outputDiv = document.getElementById('webr-code-output-2');
+  const editorDiv = document.getElementById('webr-editor-2');
+
+  const editor = CodeMirror((elt) => {
+    elt.style.border = '1px solid #eee';
+    elt.style.height = 'auto';
+    editorDiv.append(elt);
+  },{
+    value: `plot(\n  rnorm(1000), rnorm(1000),\n  col = rgb(0, 0, 0, 0.5),\n  xlim = c(-5, 5), ylim = c(-5, 5),\n  main = "This is the title 🚀",\n  xlab = "This is the x label",\n  ylab = "This is the y label",\n  family = "Futura"\n)\ntext(-3.5, 4, "This is English", family = "monospace")\ntext(-3.5, -4, "هذا مكتوب باللغة العربية")\ntext(3.5, 4, "これは日本語です")\ntext(3.5, -4, "זה כתוב בעברית")`,
+    lineNumbers: true,
+    mode: 'r',
+    theme: 'light default',
+    viewportMargin: Infinity,
+  });
+
+  runButton.onclick = async () => {
+    runButton.disabled = true;
+    let canvas = undefined;
+    await globalThis.webR.init();
+    await webR.evalRVoid('webr::canvas(width=504, height=360)');
+    const result = await webRCodeShelter.captureR(editor.getValue(), {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false,
+      env: webR.objs.emptyEnv,
+    });
+    try {
+      await webR.evalRVoid("dev.off()");
+      const out = result.output.filter(
+        evt => evt.type == 'stdout' || evt.type == 'stderr'
+      ).map((evt) => evt.data).join('\n');
+
+      const msgs = await webR.flush();
+      msgs.forEach(msg => {
+        if (msg.type === 'canvas' && msg.data.event === 'canvasImage'){
+          if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvas.setAttribute('width', 2 * 504);
+            canvas.setAttribute('height', 2 * 360);
+            canvas.style.width="700px";
+            canvas.style.display="block";
+            canvas.style.margin="auto";
+          }
+          canvas.getContext('2d').drawImage(msg.data.image, 0,0,canvas.width,canvas.height)
+        }
+      });
+
+      outputDiv.innerHTML = '';
+      const pre = document.createElement("pre");
+      if (/\S/.test(out)) {
+        const code = document.createElement("code");
+        code.innerText = out;
+        pre.appendChild(code);
+      } else {
+        pre.style.visibility = 'hidden';
+      }
+      outputDiv.appendChild(pre);
+
+      if (canvas) {
+        const p = document.createElement("p");
+        p.appendChild(canvas);
+        outputDiv.appendChild(p);
+      }
+    } finally {
+      webRCodeShelter.purge();
+      runButton.disabled = false;
+    }
+  }
+</script>
+<div class="page-columns page-full"><p>Any system font available to the web browser can now be used<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. As well as a nice-to-have, this also provides improved accessibility. For example, there are fonts designed specifically for use by readers with dyslexia and other similar reading barriers<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> that could be used for drawing text in plots.</p><div class="no-row-height column-margin column-container"><li id="fn4"><p><sup>4</sup>&nbsp;This also includes the world of CSS web fonts, but it is a little tricky. <a href="https://stackoverflow.com/a/53808942">Extra work</a> must be done so that the font is available to the Web Worker. Probably this can be handled better in a future release of <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a>.</p></li><li id="fn5"><p><sup>5</sup>&nbsp;<a href="https://www.dyslexiefont.com">Dyslexie</a>, <a href="https://opendyslexic.org">Open Dyslexic</a>. Results of research in this area is mixed, but even if these fonts don’t improve the speed of text comprehension, some users may simply prefer or feel more comfortable with them.</p></li></div></div>
+<p>Font metrics are now exact, using <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/measureText"><code>measureText()</code></a>, rather than estimating the width and height of Latin glyphs using heuristics. This gives more accurate positioning of rendered text and improves the general quality of resulting plots.</p>
+<p>Support for Unicode, font glyph fallback, complex ligatures, and right-to-left (RTL) text have all been improved. This vastly improves results when rendering text for international users, particularly for non-Latin RTL scripts such as the Arabic and Hebrew text in the example above.</p>
+<p>Also, colour emoji can now be added to plots. 😃</p>
+</section>
+<section id="paths-and-winding-rules" class="level3">
+<h3 class="anchored" data-anchor-id="paths-and-winding-rules">Paths and winding rules</h3>
+<p>Additional support for the drawing and filling of paths and polygons, including with different <a href="https://oreillymedia.github.io/Using_SVG/extras/ch06-fill-rule.html">winding rules</a>, has been added to the webR canvas graphics device. An area where this new functionality makes a world of difference is plotting spatial features and maps. Previously broken R code for plotting maps with the <code>ggplot2</code> and <code>sf</code> packages now works well with webR 0.2.0.</p>
+<p><a href="paths.png"><img alt="A screenshot of R plotting code testing paths with winding settings and map plotting. Output on the left for webR 0.1.1 is broken. Output on the right for webR 0.2.0 works correctly" width="95%" src="paths.png"></a></p>
+</section>
+<section id="output-messages-from-the-canvas-graphics-device" class="level3">
+<h3 class="anchored" data-anchor-id="output-messages-from-the-canvas-graphics-device">Output messages from the canvas graphics device</h3>
+<p>As a result of the changes to the HTML canvas graphics device, the structure of output messages communicated to the main thread has been redesigned. This is a breaking change and existing webR applications will need to be updated to listen for the new output messaging format.</p>
+<p><a href="https://docs.r-wasm.org/webr/latest/plotting.html">A Plotting section</a> has been added to the webR documentation describing how plotting works with the <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a> device, and how to handle the output messages in your own web applications.</p>
+<p>A <code>'canvas'</code> type output message with an <code>event</code> property of <code>'canvasNewPage'</code> indicates the start of a new plot,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>{ type<span class="op">:</span> <span class="st">'canvas'</span><span class="op">,</span> data<span class="op">:</span> { event<span class="op">:</span> <span class="st">'canvasNewPage'</span> } }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>An output message with an <code>event</code> property of <code>'canvasImage'</code> indicates that there is some graphics data ready to be drawn,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>{ type<span class="op">:</span> <span class="st">'canvas'</span><span class="op">,</span> data<span class="op">:</span> { event<span class="op">:</span> <span class="st">'canvasImage'</span><span class="op">,</span> image<span class="op">:</span> <span class="bu">ImageBitmap</span> } }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>image</code> property in the message data contains a JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a> object. This can be drawn to a HTML <code>&lt;canvas&gt;</code> element using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage"><code>drawImage()</code></a> method.</p>
+</section>
+</section>
+<section id="built-in-bitmap-graphics-devices" class="level2">
+<h2 class="anchored" data-anchor-id="built-in-bitmap-graphics-devices">Built-in bitmap graphics devices</h2>
+<p>Not all environments where webR could be running support plotting to a HTML <code>&lt;canvas&gt;</code> element. Older browsers may not support the required <code>OffscreenCanvas</code> interface, webR might be running server-side in Node.js, or webR might be running more traditional R code or packages that are unaware of the <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a> graphics device.</p>
+<p>For supporting these use cases, with webR 0.2.0 the built-in bitmap graphics devices are now able to be used, writing their output to the webR VFS. This includes the <a href="https://rdrr.io/r/grDevices/png.html"><code>png()</code></a>, <a href="https://rdrr.io/r/grDevices/png.html"><code>bmp()</code></a>, <a href="https://rdrr.io/r/grDevices/png.html"><code>jpeg()</code></a>, <a href="https://rdrr.io/r/grDevices/png.html"><code>tiff()</code></a> devices, and potentially others implemented using the Cairo graphics library.</p>
+<p>In the example below, webR is loaded into a JavaScript environment and plotting is done using the built-in <a href="https://rdrr.io/r/grDevices/png.html"><code>png()</code></a> graphics device. The resulting image is written to the virtual filesystem and its contents can then be obtained using webR’s <a href="https://docs.r-wasm.org/webr/latest/api/js/classes/WebR.WebR.html#fs"><code>FS</code></a> interface, designed to be similar to <a href="https://emscripten.org/docs/api_reference/Filesystem-API.html">Emscripten’s filesystem API</a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { WebR } <span class="im">from</span> <span class="st">'webr'</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> webR <span class="op">=</span> <span class="kw">new</span> <span class="fu">WebR</span>()<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> webR<span class="op">.</span><span class="fu">init</span>()<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalRVoid</span>(<span class="vs">`</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="vs">  png('/tmp/Rplot.png', width = 800, height = 800, res = 144)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="vs">  hist(rnorm(1000))</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="vs">  dev.off()</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> plotImageData <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="at">FS</span><span class="op">.</span><span class="fu">readFile</span>(<span class="st">'/tmp/Rplot.png'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The image data is contained in the <code>plotImageData</code> variable as a JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array"><code>UInt8Array</code></a>. Once obtained from the VFS, the image can be served to the end user as a <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob"><code>Blob</code></a> file download, displayed on a web page, or if running webR server-side returned over the network.</p>
+<section id="text-rendering-and-font-support" class="level3">
+<h3 class="anchored" data-anchor-id="text-rendering-and-font-support">Text rendering and font support</h3>
+<p>As with the <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a> improvements described in the previous section, we feel it is important that the built in R graphics devices provides a high level of support for text rendering in webR. Here, however, the approach is different. The built-in graphics devices renders image data entirely within the WebAssembly environment, so we can no longer rely on the web browser for high quality text!</p>
+<p>The built-in graphics devices are powered by the Cairo graphics library, which can now optionally be compiled for Wasm as part of the webR build process. In addition, when enabled various other libraries are compiled for Wasm to improve the quality of text rendering in Cairo,</p>
+<ul>
+<li><a href="https://pango.gnome.org">pango</a></li>
+<li><a href="http://fribidi.org">fribidi</a></li>
+<li><a href="https://harfbuzz.github.io">harfbuzz</a></li>
+<li><a href="https://freetype.org">freetype</a></li>
+<li><a href="https://www.freedesktop.org/wiki/Software/fontconfig/">fontconfig</a></li>
+</ul>
+<p>Public releases of webR distributed via GitHub and CDN will be built with these libraries all enabled and included.</p>
+<section id="font-files-on-the-vfs" class="level4">
+<h4 class="anchored" data-anchor-id="font-files-on-the-vfs">Font files on the VFS</h4>
+<p>When plotting with the built-in bitmap graphics devices, fonts must be accessible to the Cairo library through the webR VFS. A minimal selection of <a href="https://fonts.google.com/noto">Google’s Noto fonts</a> are bundled with webR when Cairo graphics is enabled.</p>
+<p>The fontconfig library is also configured to search the VFS directory <code>/home/web_user/fonts</code> for additional fonts. Users who wish to use custom fonts, or alternative writing systems, may do so by uploading font files to this directory. In the case of international scripts or non-Latin Unicode such as emoji, fontconfig will automatically use font fallback to select reasonable fonts containing the required glyphs.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">png</span>(<span class="at">width =</span> <span class="dv">1200</span>, <span class="at">height =</span> <span class="dv">800</span>, <span class="at">res =</span> <span class="dv">180</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rnorm</span>(<span class="dv">1000</span>), <span class="fu">rnorm</span>(<span class="dv">1000</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">0.5</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"This is the title 🚀"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">"This is the x label"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">"This is the y label"</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="sc">-</span><span class="fl">3.5</span>, <span class="dv">4</span>, <span class="st">"This is English"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="sc">-</span><span class="fl">3.5</span>, <span class="sc">-</span><span class="dv">4</span>, <span class="st">"هذا مكتوب باللغة العربية"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">3.5</span>, <span class="dv">4</span>, <span class="st">"これは日本語です"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">3.5</span>, <span class="sc">-</span><span class="dv">4</span>, <span class="st">"זה כתוב בעברית"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This is essentially the same example as in the previous section, demonstrating a selection of advanced font functionality. In this example we are rendering a PNG file using the built-in <a href="https://rdrr.io/r/grDevices/png.html"><code>png()</code></a> graphics device. We can see that by uploading appropriate fonts to the VFS, the same set of advanced text rendering features that are provided by the browser can also be used with R’s built-in bitmap graphics devices.</p>
+<p><a href="textplot.png"><img alt="A screenshot showing the output of the above plotting code is shown on the left. The additional fonts uploaded to the VFS are listed on the right." width="100%" src="textplot.png"></a></p>
+</section>
+</section>
+</section>
+<section id="lazy-virtual-filesystem" class="level2">
+<h2 class="anchored" data-anchor-id="lazy-virtual-filesystem">Lazy virtual filesystem</h2>
+<p>All of the additional features I’ve written about so far come with a price: increased Wasm binary and data download size. Consider the fonts in the previous section - each font file bundled with webR is going to increase the total size of the default webR filesystem by around 500KB.</p>
+<p>This is a high price to pay in time and bandwidth when not every user is going to need every feature. A similar principle also applies to other files included with R by default. It’s nice that all the default R documentation, examples, and datasets are available on the VFS, but we don’t necessarily need those files downloaded every time to every client machine.</p>
+<p>With webR 0.2.0 a “lazy” virtual filesystem mechanism, powered by <a href="https://emscripten.org/docs/porting/files/Synchronous-Virtual-XHR-Backed-File-System-Usage.html">a feature of Emscripten’s FS API</a>, is introduced. With this, only the files required to launch R and use the default packages are downloaded at initialisation time. Additional files provided on the VFS are still available for use, but they are only downloaded from the remote server when they are requested in some way by the running Wasm R process.</p>
+<p>With the introduction of the lazy virtual filesystem, along with other efficiency improvements, the initial download size for webR is now much smaller, a great improvement.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>0.1.1</th>
+<th>0.2.0</th>
+<th>(% of previous)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>R.bin.data</code></td>
+<td>25.3MB</td>
+<td>5.2MB</td>
+<td>20.6%</td>
+</tr>
+<tr class="even">
+<td><code>R.bin.wasm</code></td>
+<td>12.8MB</td>
+<td>1.7MB</td>
+<td>7.5%</td>
+</tr>
+<tr class="odd">
+<td><strong>Total for the webR REPL app</strong></td>
+<td>40.2MB</td>
+<td>9.5MB</td>
+<td>23.6%</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="r-packages">R packages</h2>
+<p>Since initial release, webR has supported loading R packages by first installing them to the Emscripten VFS using the helper function <a href="https://docs.r-wasm.org/webr/latest/api/r.html#install-one-or-more-packages-from-a-webr-binary-package-repo"><code>webr::install()</code></a> or by manually placing R packages in the VFS at <code>/usr/lib/R/library</code>. We find that pure R packages usually work well, but R packages with underlying C (or Fortran, or otherwise…) code must be compiled from source for Wasm.</p>
+<p>We host a public CRAN-like R package repository containing packages built for Wasm in this way, so that there exists a subset of useful and supported R packages that can be used with webR. The public repository is hosted at <a href="https://repo.r-wasm.org" class="uri">https://repo.r-wasm.org</a> and this repo URL is used by default when running <a href="https://docs.r-wasm.org/webr/latest/api/r.html#install-one-or-more-packages-from-a-webr-binary-package-repo"><code>webr::install()</code></a> to install a Wasm R package.</p>
+<p>It remains the case that building custom R packages for Wasm is not well documented, but we do hope to improve the situation over time as our package build infrastructure develops and matures. In the future, we plan to provide a Wasm R package build system as a set of Docker containers, so that users are able to build their own packages for webR using a container environment.</p>
+<section id="webassembly-system-libraries-for-r-packages" class="level3">
+<h3 class="anchored" data-anchor-id="webassembly-system-libraries-for-r-packages">WebAssembly system libraries for R packages</h3>
+<p>Many R packages require linking with system libraries to build and run. When building such R packages for WebAssembly, not only does the package code require compiling for Wasm, but also any system libraries that code depends on.</p>
+<p>To expand support for R packages, webR 0.2.0 ships with <a href="https://github.com/r-wasm/webr/tree/main/libs/recipes">additional recipes</a> to build system libraries from source for Wasm. The libraries consist of a selection of utility, database, graphics, text rendering, geometry, and geospatial support packages, with specific libraries chosen for their possibility to be compiled for Wasm as well as the number of R packages relying on them. I expect that the number of system libraries supported will continue to grow over time as we attempt to build more R packages for Wasm.</p>
+<p>As of webR 0.1.1, <strong>219</strong> packages were available to install through our public Wasm R package repo. With the release of webR 0.2.0 and its additional system libraries, the number of available packages is now <strong>10324</strong> (approximately 51% of CRAN packages). Though, it should be noted that these packages have not been tested in detail. Here, “available” just means that the Emscripten compiler successfully built the R package for Wasm, along with its prerequisite packages.</p>
+</section>
+<section id="public-wasm-r-packages-dashboard" class="level3">
+<h3 class="anchored" data-anchor-id="public-wasm-r-packages-dashboard">Public Wasm R packages dashboard</h3>
+<p>While available R packages can be listed using <a href="https://rdrr.io/r/utils/available.packages.html"><code>available.packages()</code></a> with our CRAN-like Wasm R package repo, it’s not the smoothest experience for users simply wanting to check if a given package is available. A dashboard has been added to the <a href="https://repo.r-wasm.org">repo index page</a> which lists the available packages compiled for Wasm in an interactive table. The table also lists package dependencies, noting which prerequisite packages, if any, are still missing.</p>
+<p><a href="repo.png"><img alt="A screenshot of the webR binary R package repository index page. A table of available R packages is shown, along with their prerequisites" width="95%" src="repo.png"></a></p>
+<p>It might be interesting to note that this dashboard itself is running under webR, through a fully client-side Shiny app.</p>
+</section>
+</section>
+<section id="running-httpuv-shiny-under-webr" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="running-httpuv-shiny-under-webr">Running httpuv &amp; Shiny under webR</h2>
+<p>Using features new to webR 0.2.0, a <a href="https://github.com/r-wasm/httpuv">httpuv webR package shim</a> has been created that provides the functionality usually provided by the <a href="https://cran.r-project.org/web/packages/httpuv/index.html">httpuv</a> R package. The package enables R to handle HTTP and WebSocket traffic, and is a prerequisite for the R Shiny package.</p>
+<p>The shim works by taking advantage of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API">JavaScript Service Worker API</a>. Normally Service Workers are used to implement fast offline caching of web content, but they can also be used as a general network proxy. The httpuv shim makes use of a Service Worker to intercept network traffic from a running Shiny web client, and forward that traffic to be handled by an instance of webR.</p>
+<div class="page-columns page-full"><p>From the Shiny server’s point of view, it is communicating with the usual httpuv package using its R API. From the point of view of the Shiny web client, it is talking to a Shiny server over the network. Between the two, the JavaScript Service Worker and webR work together to act as a network proxy and handle the traffic entirely within the client<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>.</p><div class="no-row-height column-margin column-container"><li id="fn6"><p><sup>6</sup>&nbsp;<a href="https://shiny.posit.co/py/docs/shinylive.html">Shinylive for Python</a> also uses a JavaScript Service Worker scheme to serve fully client-side apps.</p></li></div></div>
+<p><a href="httpuv.png"><img alt="A block diagram showing how the httpuv shim, webR worker thread, and Shiny work together. See the preceding diagram for an explanation of how the blocks interact" width="90%" src="httpuv.png"></a></p>
+<p>The httpuv shim package is still in the experimental stage, but it is currently available for testing and is included in our public webR package repository.</p>
+<section id="an-example-shiny-app" class="level3">
+<h3 class="anchored" data-anchor-id="an-example-shiny-app">An example shiny app</h3>
+<p><a href="shiny.png"><img alt="A screenshot of the webR Shiny demo. The shiny app is shown in the top section of the screenshot, an input slider and an output histogram plot. The lower section shows the normally server-side Shiny package console output when tracing is enabled." width="90%" src="shiny.png"></a></p>
+<p>An example Shiny app, making use of the httpuv shim and running fully client-side, is available at <a href="https://shiny-standalone-webr-demo.netlify.app" class="uri">https://shiny-standalone-webr-demo.netlify.app</a>.</p>
+<p>Once the app has loaded in your browser, it’s possible to confirm that the app is running entirely client-side by observing the Shiny server trace output at the bottom of the screen. You should even be able to disconnect completely from the internet and continue to use the app offline.</p>
+<p>The source code for the demo, which includes some information describing how to set up a webR Shiny server in this way, can be found at <a href="https://github.com/georgestagg/shiny-standalone-webr-demo">georgestagg/shiny-standalone-webr-demo</a>. Note that this repository is targeted towards advanced web developers with prior experience of development with JavaScript Web Workers. It is intended as a demonstration of the technology, rather than a tutorial.</p>
+<p>A coming-soon version of Shinylive for R will provide a much better user experience for getting fully client-side R Shiny apps up and running, without requiring advanced knowledge of JavaScript’s Worker API. I believe Shinylive with webR integration will pave the way for providing a user-friendly method to build and deploy containerised R Shiny apps, running on WebAssembly.</p>
+</section>
+</section>
+<section id="changes-to-the-webr-developer-api" class="level2">
+<h2 class="anchored" data-anchor-id="changes-to-the-webr-developer-api">Changes to the webR developer API</h2>
+<p>It’s possible for webR to be used in isolation, but it’s likely that developers will want to interface webR with other JavaScript frameworks and tools. The dynamism and interconnectivity of the web is one of its great strengths, and we’d like the same to be true of webR. This section describes changes to webR’s developer API, used to interact with the running R session from the JavaScript environment.</p>
+<section id="performance-improvements-with-messagepack-protocol" class="level3">
+<h3 class="anchored" data-anchor-id="performance-improvements-with-messagepack-protocol">Performance improvements with MessagePack protocol</h3>
+<p>When working to integrate webR into a wider application, at some point we will need to move data into the running R process, and later return results back to JavaScript. It’s possible to move data into R by evaluating R code directly, but the webR library also provides <a href="https://docs.r-wasm.org/webr/latest/convert-js-to-r.html">other ways to transfer raw data to R</a>.</p>
+<p>Consider the example below. Data is transferred from JavaScript into the running R process by binding <code>jsData</code> to an R variable in the global environment using <a href="https://docs.r-wasm.org/webr/latest/convert-js-to-r.html#binding-objects-to-an-r-environment"><code>webR.objs.globalEnv.bind()</code></a>. Next, some computation on the data is done, represented as evaluating the <code>do_analysis()</code> R function. Finally the result is returned back to JavaScript, first as a reference to an R object and then transferring the result data back to the JavaScript environment using <a href="https://docs.r-wasm.org/webr/latest/convert-r-to-js.html#serialising-r-objects"><code>toJs()</code></a>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> jsData <span class="op">=</span> [<span class="op">...</span> some large JavaScript dataset <span class="op">...</span>]<span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> webR<span class="op">.</span><span class="at">objs</span><span class="op">.</span><span class="at">globalEnv</span><span class="op">.</span><span class="fu">bind</span>(<span class="st">'data'</span><span class="op">,</span> jsData)<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ret <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalR</span>(<span class="st">"do_analysis(data)"</span>)<span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> ret<span class="op">.</span><span class="fu">toJs</span>()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It’s easy to see how this workflow could be useful as part of a wider application, enabling a complex data manipulation or a statistical modelling in R that would otherwise be awkward to perform directly in JavaScript.</p>
+<p>Behind the scenes, we’ve done work to ensure that data is transferred efficiently to and from the R environment, and in webR 0.2.0 the <a href="https://msgpack.org/index.html">MessagePack</a> protocol is now used as the main way that data is serialised and transferred, replacing JSON encoding.</p>
+<p>This change provides a significant performance improvement. <a href="https://github.com/r-wasm/webr/pull/204">Initial testing</a> shows an order of magnitude speed boost when transferring large sets of data from the JavaScript environment into R. Thanks to <a href="https://github.com/r-wasm/webr/issues/203"><span class="citation" data-cites="jeroen">@jeroen</span></a> for prompting me to look into it!</p>
+</section>
+<section id="the-typing-of-r-object-references" class="level3">
+<h3 class="anchored" data-anchor-id="the-typing-of-r-object-references">The typing of R object references</h3>
+<p>When working with webR in TypeScript it is important to keep track of R object types. All references to R objects are instances of the <a href="https://docs.r-wasm.org/webr/latest/objects.html"><code>RObject</code></a> class, and various subclasses implement specific features for each fundamental R data type.</p>
+<p>In this example, an <a href="https://docs.r-wasm.org/webr/latest/api/js/classes/RWorker.RDouble.html"><code>RDouble</code></a> object is returned at runtime, but <code>webR.evalR()</code> is typed to return a generic <code>RObject</code>. Notice that the <a href="https://docs.r-wasm.org/webr/latest/api/js/classes/RWorker.RDouble.html#tonumber"><code>.toNumber()</code></a> method exists on <code>RDouble</code>, but not on the <code>RObject</code> superclass. So while this example runs with no problem once compiled to JavaScript, it gives an error under TypeScript!</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalR</span>(<span class="st">'1.23456'</span>)<span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> data <span class="op">=</span> <span class="cf">await</span> obj<span class="op">.</span><span class="fu">toJs</span>()<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> num <span class="op">=</span> <span class="cf">await</span> obj<span class="op">.</span><span class="fu">toNumber</span>()<span class="op">;</span> <span class="co">// An error under TypeScript!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>One solution is to use the <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions"><code>as</code></a> keyword to assert a specific type of <code>RObject</code> subclass. Alternatively, webR also provides <a href="https://docs.r-wasm.org/webr/latest/evaluating.html#returning-javascript-values-when-evaluating-r-code">variants of the <code>evalR()</code> function</a> that return and convert results to a specific type of JavaScript object.</p>
+<p>In many cases these methods will work well, <em>but they require you to know for sure what type of R object has been returned</em>. Additional support has been added in webR 0.2.0 to better handle typing when it is not entirely clear what type of <code>RObject</code> you have.</p>
+<section id="type-predicate-functions" class="level4">
+<h4 class="anchored" data-anchor-id="type-predicate-functions">Type predicate functions</h4>
+<p>TypeScript supports a kind of return type known as a <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates">type predicate</a>. These return types can be used to create user-defined type guards, functions that take an object argument and return a boolean indicating if the object is of a compatible type. With this, TypeScript is able to automatically <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">narrow</a> types based on the return value from the type predicate function.</p>
+<p>WebR 0.2.0 ships with a selection of <a href="https://docs.r-wasm.org/webr/latest/objects.html#type-predicate-functions">type predicate functions for each fundamental R data type</a> supported by webR. In the following example, the TypeScript error described above is dealt with by using the function <a href="https://docs.r-wasm.org/webr/latest/api/js/modules/RMain.html#isrdouble"><code>isRDouble()</code></a>. Inside the branch, TypeScript narrows the object type to an <code>RDouble</code>, resolving the issue.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { isRDouble } <span class="im">from</span> <span class="st">'webr'</span><span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalR</span>(<span class="st">'1.23456'</span>)<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">isRDouble</span>(obj)) {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// In this branch, TypeScript narrows the type of `obj` to an `RDouble`</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> num <span class="op">=</span> <span class="cf">await</span> obj<span class="op">.</span><span class="fu">toNumber</span>()<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Do something with `num` ...</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>} <span class="cf">finally</span> {</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  webR<span class="op">.</span><span class="fu">destroy</span>(obj)<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="handling-errors-with-webrerror" class="level3">
+<h3 class="anchored" data-anchor-id="handling-errors-with-webrerror">Handling errors with <code>WebRError</code></h3>
+<p>When executing R code with webR’s <code>evalR()</code> family of functions, by default any error condition from R is converted into a JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"><code>Error</code></a> and thrown. This feature can be very useful, because it allows developers to catch issues while executing R code in the native JavaScript environment.</p>
+<p>However, consider the following example,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalR</span>(<span class="st">'some_R_code()'</span>)<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">doSomethingWith</span>(result)<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>} <span class="cf">catch</span> (e) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Handle some error that occured</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If an error is thrown, how can we tell if the error came from R or from some issue inside the JavaScript function? Nested <code>try</code>/<code>catch</code> could be used, but this becomes unwieldy quickly. Parsing the error message text is another option, though not so elegant.</p>
+<p>With webR 0.2.0 any errors that occur in R code executed using <code>evalR()</code>, or any internal webR issues, are thrown as instances of <a href="https://docs.r-wasm.org/webr/latest/api/js/classes/WebR.WebRError.html"><code>WebRError</code></a>. With this change, the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof"><code>instanceof</code></a> keyword can be used to differentiate between errors occurring in R, and errors in JavaScript code.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { WebRError } <span class="im">from</span> <span class="st">'webR'</span><span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> {</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">evalR</span>(<span class="st">'some_R_code()'</span>)<span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">doSomethingWith</span>(result)<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>} <span class="cf">catch</span> (e) {</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (e <span class="kw">instanceof</span> WebRError) {</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">"An error occured executing R code"</span>)<span class="op">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">"An error occured in JavaScript"</span>)<span class="op">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">throw</span> e<span class="op">;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="safely-handling-webr-termination" class="level3">
+<h3 class="anchored" data-anchor-id="safely-handling-webr-termination">Safely handling webR termination</h3>
+<p>Consider the following <code>async</code> loop, a useful pattern to continuously handle webR output messages,</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">run</span>() {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="op">;;</span>) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> output <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">read</span>()<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">switch</span> (output<span class="op">.</span><span class="at">type</span>) {</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> <span class="st">'stdout'</span><span class="op">:</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> <span class="st">'stderr'</span><span class="op">:</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(output<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">warn</span>(<span class="vs">`Unhandled output type: </span><span class="sc">${</span>output<span class="op">.</span><span class="at">type</span><span class="sc">}</span><span class="vs">.`</span>)<span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here <code>await webR.read()</code> waits asynchronously for output messages from webR’s communication channel. For example, a running R process might print results between long computational delays. Such occasional printed output might be received as messages with a <code>type</code> property of <code>'stdout'</code>.</p>
+<p>After a message is received, it is handled in a <code>switch</code> statement and then the loop continues around to wait for another output message. This works well while webR is running, but what happens when terminated with <a href="https://docs.r-wasm.org/webr/latest/api/js/classes/WebR.WebR.html#close"><code>webR.close()</code></a>? The R worker thread is stopped and destroyed, but the loop continues to wait for a message that will never come.</p>
+<p>With webR 0.2.0 a new type of message is issued when webR is terminated using <code>webR.close()</code>. After the webR worker thread has been destroyed, a message is emitted on the usual output channel with a <code>type</code> property of <code>'closed'</code>, with no associated <code>data</code> property. The implication is that once this message has been emitted, that particular instance of webR has terminated and the the async loop is no longer needed.</p>
+<p>With this change, exiting the loop once webR has terminated could be as simple as adding an extra <code>case</code> statement,</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode typescript code-with-copy"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">run</span>() {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="op">;;</span>) {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> output <span class="op">=</span> <span class="cf">await</span> webR<span class="op">.</span><span class="fu">read</span>()<span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">switch</span> (output<span class="op">.</span><span class="at">type</span>) {</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> <span class="st">'stdout'</span><span class="op">:</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> <span class="st">'stderr'</span><span class="op">:</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(output<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> <span class="st">'closed'</span><span class="op">:</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>      <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">warn</span>(<span class="vs">`Unhandled output type: </span><span class="sc">${</span>output<span class="op">.</span><span class="at">type</span><span class="sc">}</span><span class="vs">.`</span>)<span class="op">;</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="installation-and-next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="installation-and-next-steps">Installation and next steps</h2>
+<p>Developers can integrate webR in their own JavaScript or TypeScript projects by installing the <a href="https://www.npmjs.com/package/webr">webR npm package</a>, or by directly importing webR from CDN. Issues and PRs are accepted and welcome on the main <a href="https://github.com/r-wasm/webr">r-wasm/webr</a> GitHub repository.</p>
+<section id="npm" class="level3">
+<h3 class="anchored" data-anchor-id="npm">npm</h3>
+<p>With this release, the webR npm package name has been updated, simplified from the original <code>@r-wasm/webr</code> package name to simply <code>webr</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> i webr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The original namespaced package <code>@r-wasm/webr</code> will be deprecated, and from v0.2.0 onwards npm will display a message pointing to the new package name.</p>
+</section>
+<section id="cdn-url" class="level3">
+<h3 class="anchored" data-anchor-id="cdn-url">CDN URL</h3>
+<p>Alternatively, webR can be imported directly as a module from CDN.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { WebR } <span class="im">from</span> <span class="st">"https://webr.r-wasm.org/v0.2.0/webr.mjs"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="binary-release-packages" class="level3">
+<h3 class="anchored" data-anchor-id="binary-release-packages">Binary release packages</h3>
+<p>Finally, binary webR packages can be downloaded from GitHub on the releases page of the <a href="https://github.com/r-wasm/webr">r-wasm/webr</a> repo.</p>
+</section>
+<section id="documentation" class="level3">
+<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
+<p>The next step of integrating webR into your own software should be to visit the documentation pages, provided at <a href="https://docs.r-wasm.org/webr/v0.2.0/" class="uri">https://docs.r-wasm.org/webr/v0.2.0/</a>. My previous <a href="https://www.tidyverse.org/blog/2023/03/webr-0-1-0/">webR release blog post</a> also briefly explains how to get started, though the docs go into much more detail.</p>
+</section>
+</section>
+<section id="acknowledgements" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
+<p>A big thank you to all of webR’s early adopters, experimenting with the system and providing feedback in the form of GitHub Issues and PRs.</p>
+<p><a href="https://github.com/Anurodhyadav"><span class="citation" data-cites="Anurodhyadav">@Anurodhyadav</span></a>, <a href="https://github.com/arkraieski"><span class="citation" data-cites="arkraieski">@arkraieski</span></a>, <a href="https://github.com/averissimo"><span class="citation" data-cites="averissimo">@averissimo</span></a>, <a href="https://github.com/awconway"><span class="citation" data-cites="awconway">@awconway</span></a>, <a href="https://github.com/bahadzie"><span class="citation" data-cites="bahadzie">@bahadzie</span></a>, <a href="https://github.com/ceciliacsilva"><span class="citation" data-cites="ceciliacsilva">@ceciliacsilva</span></a>, <a href="https://github.com/DanielEWeeks"><span class="citation" data-cites="DanielEWeeks">@DanielEWeeks</span></a>, <a href="https://github.com/eteitelbaum"><span class="citation" data-cites="eteitelbaum">@eteitelbaum</span></a>, <a href="https://github.com/fortunewalla"><span class="citation" data-cites="fortunewalla">@fortunewalla</span></a>, <a href="https://github.com/gedw99"><span class="citation" data-cites="gedw99">@gedw99</span></a>, <a href="https://github.com/gwd-at"><span class="citation" data-cites="gwd-at">@gwd-at</span></a>, <a href="https://github.com/hatemhosny"><span class="citation" data-cites="hatemhosny">@hatemhosny</span></a>, <a href="https://github.com/hrbrmstr"><span class="citation" data-cites="hrbrmstr">@hrbrmstr</span></a>, <a href="https://github.com/ivelasq"><span class="citation" data-cites="ivelasq">@ivelasq</span></a>, <a href="https://github.com/JeremyPasco"><span class="citation" data-cites="JeremyPasco">@JeremyPasco</span></a>, <a href="https://github.com/jeroen"><span class="citation" data-cites="jeroen">@jeroen</span></a>, <a href="https://github.com/jooyoungseo"><span class="citation" data-cites="jooyoungseo">@jooyoungseo</span></a>, <a href="https://github.com/jpjais"><span class="citation" data-cites="jpjais">@jpjais</span></a>, <a href="https://github.com/kforner"><span class="citation" data-cites="kforner">@kforner</span></a>, <a href="https://github.com/lauritowal"><span class="citation" data-cites="lauritowal">@lauritowal</span></a>, <a href="https://github.com/lionel-"><span class="citation" data-cites="lionel">@lionel</span>-</a>, <a href="https://github.com/matthiasbirkich"><span class="citation" data-cites="matthiasbirkich">@matthiasbirkich</span></a>, <a href="https://github.com/neocarto"><span class="citation" data-cites="neocarto">@neocarto</span></a>, <a href="https://github.com/noamross"><span class="citation" data-cites="noamross">@noamross</span></a>, <a href="https://github.com/Polkas"><span class="citation" data-cites="Polkas">@Polkas</span></a>, <a href="https://github.com/qiushiyan"><span class="citation" data-cites="qiushiyan">@qiushiyan</span></a>, <a href="https://github.com/ries9112"><span class="citation" data-cites="ries9112">@ries9112</span></a>, <a href="https://github.com/SugarRayLua"><span class="citation" data-cites="SugarRayLua">@SugarRayLua</span></a>, <a href="https://github.com/timelyportfolio"><span class="citation" data-cites="timelyportfolio">@timelyportfolio</span></a>, <a href="https://github.com/WebReflection"><span class="citation" data-cites="WebReflection">@WebReflection</span></a>, and <a href="https://github.com/WillemSleegers"><span class="citation" data-cites="WillemSleegers">@WillemSleegers</span></a>.</p>
+
+
+</section>
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
