@@ -4,9 +4,6 @@ about:
   template: jolla
   image: images/george_stagg.jpg
   links:
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com/gwstagg
     - icon: mastodon
       text: Mastodon
       href: https://home.social/@gws
@@ -21,5 +18,5 @@ about:
       href: mailto:george@stagg.phd
 ---
 
-Open Source Software Engineer @ Posit Software, PBC.\
+Senior Software Engineer @ Posit Software, PBC.\
 Lead Developer of the [webR](https://docs.r-wasm.org/webr/latest/) project.
