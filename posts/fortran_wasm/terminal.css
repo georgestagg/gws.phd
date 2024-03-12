@@ -1,0 +1,51 @@
+.console {
+    background-color: #121416;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.875rem;
+    padding: 0.4em;
+    border-radius: 0.25rem;
+    margin: 1em 0 2em 0;
+    color: #FFFFFF;
+}
+
+.console .prompt {
+    color: #3FFB01;
+    font-weight: bold;
+    user-select: none;
+}
+
+.console .prompt::after {
+    color: #FFFFFF;
+    font-weight: normal;
+    content: '$ ';
+}
+
+.console .green {
+    color: #3FFB01;
+}
+
+.console .blue {
+    color: #34B5F6;
+}
+
+.console .purple {
+    color: #c634f6;
+}
+
+.console .out {
+    user-select: none;
+    opacity: 70%;
+}
+
+.console .line {
+    width: 100%;
+    margin: 0;
+}
+.console .line .bi {
+    display: none;
+    float: right;
+    font-size: 1rem;
+}
+.console .line:hover .bi {
+    display: inline-block;
+}
