@@ -1,47 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://gws.phd/posts/r_grammar_experiment/index.html</loc>
-    <lastmod>2023-11-06T16:58:27.327Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/posts/hyperbolic_fractals/index.html</loc>
-    <lastmod>2023-11-06T16:58:28.167Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/posts/webr_0.2.0/index.html</loc>
-    <lastmod>2023-11-06T16:58:29.941Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/posts/webr_released/index.html</loc>
-    <lastmod>2023-11-06T16:58:30.660Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/posts/diy_synth/index.html</loc>
-    <lastmod>2023-11-06T16:58:31.050Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/posts/calculator_forth/index.html</loc>
-    <lastmod>2023-11-06T16:58:31.628Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/index.html</loc>
-    <lastmod>2023-11-06T16:58:31.938Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/publications.html</loc>
-    <lastmod>2023-11-06T16:58:32.274Z</lastmod>
+    <loc>https://gws.phd/posts.html</loc>
+    <lastmod>2023-11-06T16:33:32.474Z</lastmod>
   </url>
   <url>
     <loc>https://gws.phd/education.html</loc>
-    <lastmod>2023-11-06T16:58:32.611Z</lastmod>
+    <lastmod>2023-11-06T16:33:32.456Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/index.html</loc>
+    <lastmod>2024-01-25T14:30:33.848Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/fortran_wasm/index.html</loc>
+    <lastmod>2024-03-12T11:35:19.674Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/webr_released/index.html</loc>
+    <lastmod>2023-11-06T16:38:09.276Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/hyperbolic_fractals/index.html</loc>
+    <lastmod>2023-11-06T16:33:32.502Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/r_grammar_experiment/index.html</loc>
+    <lastmod>2023-11-06T16:33:32.506Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/webr_0.2.0/index.html</loc>
+    <lastmod>2023-11-06T16:48:54.935Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/diy_synth/index.html</loc>
+    <lastmod>2023-11-06T16:33:32.499Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/posts/calculator_forth/index.html</loc>
+    <lastmod>2023-11-06T16:33:32.481Z</lastmod>
+  </url>
+  <url>
+    <loc>https://gws.phd/publications.html</loc>
+    <lastmod>2023-11-06T16:33:32.509Z</lastmod>
   </url>
   <url>
     <loc>https://gws.phd/software.html</loc>
-    <lastmod>2023-11-06T16:58:33.008Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gws.phd/posts.html</loc>
-    <lastmod>2023-11-06T16:58:33.682Z</lastmod>
+    <lastmod>2023-11-06T16:33:32.509Z</lastmod>
   </url>
 </urlset>

@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="George Stagg">
+<meta name="dcterms.date" content="2024-03-12">
+<meta name="description" content="Patching LLVM’s flang-new compiler to output WebAssembly objects.">
+
+<title>Dr George W Stagg - Fortran on WebAssembly</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../images/george_stagg.jpg" rel="icon" type="image/jpeg">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="terminal.css">
+<link rel="stylesheet" href="iframe.css">
+<meta property="og:title" content="Dr George W Stagg - Fortran on WebAssembly">
+<meta property="og:description" content="Patching LLVM’s flang-new compiler to output WebAssembly objects.">
+<meta property="og:image" content="https://gws.phd/posts/fortran_wasm/thumb.jpg">
+<meta property="og:site_name" content="Dr George W Stagg">
+<meta name="twitter:title" content="Dr George W Stagg - Fortran on WebAssembly">
+<meta name="twitter:description" content="Patching LLVM’s flang-new compiler to output WebAssembly objects.">
+<meta name="twitter:image" content="https://gws.phd/posts/fortran_wasm/thumb.jpg">
+<meta name="twitter:creator" content="@gwstagg">
+<meta name="twitter:site" content="@gwstagg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../education.html"> 
+<span class="menu-text">Education</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software.html"> 
+<span class="menu-text">Software &amp; Demos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/thesis_gws.pdf"> 
+<span class="menu-text">Thesis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/cv.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Fortran on WebAssembly</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">hacks</div>
+    <div class="quarto-category">wasm</div>
+    <div class="quarto-category">fortran</div>
+    <div class="quarto-category">programming</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Patching LLVM’s <code>flang-new</code> compiler to output WebAssembly objects.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>George Stagg </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 12, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="thumb no-row-height column-margin column-container">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./thumb.jpg" class="img-fluid figure-img" alt="Black metal gear on black metal tool, Leeds Industrial Museum."></p>
+<figcaption><small>Thumbnail by <a href="https://unsplash.com/@mikehindle">Mike Hindle</a>.</small></figcaption>
+</figure>
+</div>
+</div>
+<video controls="" autoplay="" muted="" loop="" width="100%">
+<source src="digits.webm" type="video/webm; codecs=vp9">
+<source src="digits.mp4" type="video/mp4">
+</video>
+<figcaption>
+<a href="#mnist">Digit classification</a> with machine learning, running in the browser using BLAS routines compiled to WebAssembly.
+</figcaption>
+<section id="introduction" class="level1 page-columns page-full">
+<h1>Introduction</h1>
+<p><span class="smallcaps"><a href="https://fortran-lang.org">Fortran</a></span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is one of the oldest programming languages around. It first appeared in 1957, making it older than the C programming language, the Intel 4004 CPU, and even the IBM System/360 series of mainframe computers<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. Fortran was created at a time when the byte had just been invented, and computers were still made of vacuum tubes and frustration.</p>
+<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;The name is derived from <em>Formula Translator</em>. <span class="smallcaps">Fortran</span> was originally stylised in all-caps, but modern Fortran has dropped it.</p><p><sup>2</sup>&nbsp;The System/360 was released around 1965. The 4004 around 1970. And <a href="https://en.wikipedia.org/wiki/The_C_Programming_Language">K&amp;R C</a> was published in 1978.</p><p><sup>3</sup>&nbsp;The argument goes that Fortran’s lack of aliasing and use of native arrays rather than pointer arithmetic allow the optimiser to generate more efficient output than an equivalent C program. However, there are also counter-arguments against this.</p></div><p>Over the years, Fortran has formed a rich history of use for computationally intensive scientific and engineering applications. It has powered the fluid dynamics of weather prediction and climate models, provided the condensed matter simulations for my <a href="../../docs/thesis_gws.pdf">PhD</a>, and is still considered by some to be more efficient than C for numerically heavy work<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. The syntax of modern Fortran is also surprisingly easy to get up and running with. This is not your parent’s <span class="smallcaps">Fortran&nbsp;77</span> code; most restrictions that make fixed‑form Fortran awful to use are no longer in place in modern Fortran.</p>
+<p>In a clash of computational eras, this blog post is about compiling existing Fortran code for WebAssembly so that it can run in a web browser. I’ll describe the method we currently use for the <a href="https://github.com/r-wasm/webr">webR</a> project, compiling Fortran code using a patched version of <a href="https://llvm.org">LLVM</a>’s <code>flang-new</code> compiler<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. The post also serves as a request for help. The method I describe unfortunately relies on a hack, and this hack means that I cannot contribute the changes back to LLVM without assistance from a more experienced compiler developer.</p>
+<div class="no-row-height column-margin column-container"><p><sup>4</sup>&nbsp;“LLVM” is not an acronym, it is the full name of the project.</p></div></section>
+<section id="so-whats-the-problem" class="level1 page-columns page-full">
+<h1>So, what’s the problem?</h1>
+<p>There are a surprising number of potential methods and toolchains available to compile Fortran to WebAssembly. Unfortunately, none of the available options are feature complete. Each method has its drawbacks, and none are a simple plug-and-play solution.</p>
+<p>Back in 2020, the situation was summarised wonderfully by Christoph Honal’s article <a href="https://chrz.de/2020/04/21/fortran-in-the-browser/">FORTRAN in the Browser</a>. Even now, the article is worth reading and provides a nice background for this post. I personally owe a lot to Christoph’s article, particularly for its description of the <a href="https://dragonegg.llvm.org">Dragonegg</a> toolchain. Without that article, I would have given up on Fortran for WebAssembly a long time ago.</p>
+<p>Our goal by the end of this post is to be able to compile a modern Fortran routine to WebAssembly that takes in some numerical arguments, computes the output of <a href="http://www.netlib.org/blas/">BLAS</a> and <a href="https://netlib.org/lapack/">LAPACK</a> routines<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>, and either returns the result or prints it to console. From what I remember, in 2020 none of the methods outlined in Christoph’s article could do this satisfactorily. Dragonegg and <code>f2c</code> both get close but have some drawbacks, as I’ll describe below.</p>
+<div class="no-row-height column-margin column-container"><p><sup>5</sup>&nbsp;LAPACK (Linear Algebra Package) is a popular library of routines used to numerically solve problems in linear algebra. It’s written in Fortran 90 and itself relies on a BLAS (Basic Linear Algebra Subprograms) library.</p><p><sup>6</sup>&nbsp;via <a href="https://pyodide.org/en/stable/">Pyodide</a> and <a href="https://github.com/r-wasm/webr">webR</a>.</p></div><p>Together, BLAS and LAPACK routines provide a powerful numerical platform. Running them in the browser opens the door for several higher-level programming environments that rely on them under the hood, such as SciPy or R<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. The beauty of this approach is that it allows you to bring existing and extensively battle-tested tools and libraries to the web without having to rewrite them all in Rust or JavaScript.</p>
+<p>Later, I’ll show an example of this with a machine learning demo that directly uses BLAS routines compiled from Fortran to WebAssembly. Rather than having to write fiddly linear algebra numerical algorithms in JavaScript, we can use reliable and efficient BLAS routines directly<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>7</sup>&nbsp;Whilst running machine learning algorithms in a web browser will never be as efficient as using dedicated hardware, such as a GPU, I still think it’s a fun demo.</p></div><section id="compiler-round-up" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="compiler-round-up">Compiler round-up</h2>
+<p>Since <a href="https://chrz.de/2020/04/21/fortran-in-the-browser/">FORTRAN in the Browser</a> was published things have changed a little, particularly when it comes to the LLVM-based Fortran compilers. As far as I am aware, here’s a brief round-up of the current situation in 2024.</p>
+<section id="the-f2c-utility" class="level3">
+<h3 class="anchored" data-anchor-id="the-f2c-utility">The <code>f2c</code> utility</h3>
+<p>The <a href="https://en.wikipedia.org/wiki/F2c"><code>f2c</code></a> program converts <span class="smallcaps">Fortran 77</span> to C code, which Emscripten can then compile into WebAssembly. This is the method that the <a href="https://pyodide.org/en/stable/">Pyodide</a> project uses to compile Python packages containing Fortran code. They say that this <a href="https://pyodide.org/en/0.25.0/project/roadmap.html#find-a-better-way-to-compile-fortran">“does not work very well”</a>. The tool doesn’t work with modern Fortran code, and even after conversion the result still throws fatal errors and requires extensive patching.</p>
+</section>
+<section id="lfortran" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="lfortran">LFortran</h3>
+<p>The LFortran compiler has made great strides over the last few years. In 2020, it was <a href="https://gitlab.com/lfortran/lfortran/-/issues/121">missing basic features</a> such as loops, conditionals, and variable assignment. It now supports a much wider range of language features and can be used to compile a reasonable amount of Fortran code. It can even compile to WebAssembly out of the box!<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a></p>
+<div class="no-row-height column-margin column-container"><p><sup>8</sup>&nbsp;Check out the LFortran demo at <a href="https://dev.lfortran.org" class="uri">https://dev.lfortran.org</a>. While extremely impressive, note that the first thing I tried was changing <code>x ** 2</code> to <code>x ** 3</code> and saw that such a change is currently not supported by the code generator.</p></div><p>However, there are still some barriers that make using LFortran a little rough. The project is currently considered to be in alpha phase and the developers state that issues compiling real-world code are expected. While it can successfully compile some projects, such as <a href="https://github.com/fortran-lang/minpack">MINPACK</a>, the full Fortran specification is not yet supported and so many larger projects still cannot be compiled.</p>
+<p>The LFortran developers are targeting full support for Fortran 2018, and its standout feature is an interactive Jupyter-like Fortran REPL. With a few more years of development, I expect that LFortran will be an excellent choice for compiling Fortran code for WebAssembly.</p>
+</section>
+<section id="dragonegg" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="dragonegg">Dragonegg</h3>
+<p><a href="https://dragonegg.llvm.org">Dragonegg</a> is a plugin for GCC that uses the GNU compilers as a frontend and emits LLVM IR. With this, LLVM can be used as the backend to produce WebAssembly output. The technique works, and it was the original method that I used to compile Fortran sources for the <a href="https://github.com/r-wasm/webr">webR</a> project.</p>
+<p>However, there are some pretty serious drawbacks to this approach. Dragonegg requires a very old version of GCC and LLVM<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>. For most users, this means setting up a virtual machine or Docker container to provide the necessary environment. The LLVM IR emitted by Dragonegg also needs some fairly nasty post-processing before LLVM can produce WebAssembly output. Take a look at the <a href="https://github.com/r-wasm/webr/blob/v0.1.0/tools/dragonegg/emfc.in">script originally used by webR</a> to get an idea of the extra processing required.</p>
+<div class="no-row-height column-margin column-container"><p><sup>9</sup>&nbsp;The latest supported versions are <code>gcc-4.8</code> and <code>llvm-3.3</code></p></div><p>Nevertheless, in 2020 this was the only real way to compile Fortran code for WebAssembly.</p>
+</section>
+<section id="classic-flang" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="classic-flang">Classic flang</h3>
+<p><a href="https://github.com/flang-compiler/flang">“Classic” Flang</a><a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a> is another Fortran compiler targeting LLVM, based on an open-sourced PGI/NVIDIA compiler <code>pgfortran</code>. Classic Flang never supported 32-bit output, so it is not an option for us since we’ll be using <code>wasm32</code> for our target architecture. This will likely be the case until browser support for 64-bit Wasm memory has improved<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>10</sup>&nbsp;Previously, Flang or Flang-7.</p><p><sup>11</sup>&nbsp;At the time of writing Firefox, Chrome and Node supports <code>wasm64</code>, but locked behind a feature flag.</p></div><p>Even so, the project documentation itself suggests that choosing to use Classic Flang for a new project today is probably not a great idea:</p>
+<blockquote class="blockquote">
+<p>Classic Flang […] continues to be maintained, but the plan is to replace Classic Flang with the new Flang in the future.</p>
+</blockquote>
+</section>
+<section id="llvm-flang" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="llvm-flang">LLVM Flang</h3>
+<p><a href="https://flang.llvm.org/docs/">“LLVM Flang”</a><a href="#fn12" class="footnote-ref" id="fnref12" role="doc-noteref"><sup>12</sup></a> is a full ground-up reimplementation of a Fortran frontend for LLVM. It was designed to replace Classic Flang, developed by much of the same team, and was accepted as part of the LLVM project as of LLVM 11. As such, the Flang sources can now be found in <a href="https://github.com/llvm/llvm-project/tree/main/flang">the official LLVM source tree</a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>12</sup>&nbsp;Also known as Flang, new Flang, or <code>flang-new</code>. Previously, F18.</p></div><p>Flang is not yet considered to be ready for production use, but its development is extremely active right now and pre-production versions of the <code>flang-new</code> compiler have been made available by the team. In recent years, the compiler has become very usable for compiling real-world Fortran code.</p>
+<p>Currently, LLVM Flang cannot generate WebAssembly output out of the box. Despite this, we’ll soon see that with LLVM’s modular design it’s possible to use the Flang frontend with LLVM’s WebAssembly backend. With this, we can take advantage of all the development work put into the Flang frontend by the NVIDIA and PGI teams for our own purposes of compiling Fortran to WebAssembly.</p>
+<p>This was also possible back in 2020, though it required larger patches to LLVM, injecting custom maths routines, and a multi-step compilation process. Now, due to the impressive development efforts in the <code>flang-new</code> frontend, creating a Fortran to WebAssembly compiler is possible with just a few small changes to LLVM’s source code.</p>
+</section>
+</section>
+</section>
+<section id="building-and-using-llvm-flang-for-webassembly" class="level1 page-columns page-full">
+<h1>Building and using LLVM Flang for WebAssembly</h1>
+<p>If one were interested in trying out LLVM Flang, they might grab an LLVM release using their package manager of choice. However, following that route will disappoint us, as a <code>flang-new</code> binary is not included<a href="#fn13" class="footnote-ref" id="fnref13" role="doc-noteref"><sup>13</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>13</sup>&nbsp;At least, not with LLVM v17.0.6 for macOS using <code>brew</code>.</p></div><div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>brew install llvm</div>
+<div class="line out"><span class="blue">==&gt;</span> Downloading https://formulae.brew.sh/api/formula.jws.json</div>
+<div class="line out">################################################################################ 100.0%</div>
+<div class="line out"><span class="blue">==&gt;</span> Downloading https://ghcr.io/v2/homebrew/core/llvm/manifests/17.0.6_1</div>
+<div class="line out">################################################################################ 100.0%</div>
+<div class="line out"><span class="green">==&gt;</span> Fetching llvm</div>
+<div class="line out"><span class="blue">==&gt;</span> Downloading https://ghcr.io/v2/homebrew/core/llvm/blobs/sha256:8d739bdfa4152</div>
+<div class="line out">################################################################################ 100.0%</div>
+<div class="line out"><span class="green">==&gt;</span> Installing llvm</div>
+<div class="line out"><span class="blue">==&gt;</span> Pouring llvm--17.0.6_1.arm64_sonoma.bottle.tar.gz</div>
+<div class="line out"><span class="blue">==&gt;</span> Summary</div>
+<div class="line out">🍺  /opt/homebrew/Cellar/llvm/17.0.6_1: 7,207 files, 1.7GB</div>
+<div class="line out"><span class="green">==&gt;</span> Checking for dependents of upgraded formulae...</div>
+<div class="line out"><span class="blue">==&gt;</span> No broken dependents to reinstall!</div>
+<div class="line"><span class="prompt">[~/fortran]</span>flang-new</div>
+<div class="line out">zsh: command not found: flang-new</div>
+</div>
+<p>Since we will be modifying the LLVM Flang source in any case, we’ll have to compile from scratch. Let’s grab the LLVM v18.1.1 sources and start there instead. Feel free to follow along at home; I’ll try to provide all the commands and everything you need.<a href="#fn14" class="footnote-ref" id="fnref14" role="doc-noteref"><sup>14</sup></a></p>
+<div class="no-row-height column-margin column-container"><p><sup>14</sup>&nbsp;I’m going to assume you’re familiar with <a href="https://emscripten.org">Emscripten</a> and have a version of that toolchain on your path. If not, and you want to play along, start with <a href="https://github.com/emscripten-core/emsdk">emsdk</a> to setup Emscripten on your machine, get comfortable with compiling C code for WebAssembly, then return here to continue.</p></div><div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>git clone --depth=1 --branch=llvmorg-18.1.1 https://github.com/llvm/llvm-project.git</div>
+<div class="line out">Cloning into 'llvm-project'...</div>
+<div class="line out">remote: Enumerating objects: 138937, done.</div>
+<div class="line out">Receiving objects: 100% (138937/138937), 199.81 MiB | 11.36 MiB/s, done.</div>
+<div class="line out">Note: switching to '6009708b4367171ccdbf4b5905cb6a803753fe18'.</div>
+<div class="line out">Updating files: 100% (132077/132077), done.</div>
+<div class="line"><span class="prompt">[~/fortran]</span>cmake -G Ninja -S llvm-project/llvm -B build \</div>
+<div class="line">-DCMAKE_INSTALL_PREFIX=llvm-18.1.1 \</div>
+<div class="line">-DCMAKE_BUILD_TYPE=MinSizeRel \</div>
+<div class="line">-DLLVM_DEFAULT_TARGET_TRIPLE="wasm32-unknown-emscripten" \</div>
+<div class="line">-DLLVM_TARGETS_TO_BUILD="WebAssembly" \</div>
+<div class="line">-DLLVM_ENABLE_PROJECTS="clang;flang;mlir"</div>
+<div class="line out">-- The C compiler identification is AppleClang 15.0.0.15000100</div>
+<div class="line out">-- Found assembler: /Library/Developer/CommandLineTools/usr/bin/cc</div>
+<div class="line out">-- Detecting C compiler ABI info - done</div>
+<div class="line out">-- Performing Test HAVE_POSIX_REGEX -- success</div>
+<div class="line out">-- Configuring done (29.0s)</div>
+<div class="line out">-- Generating done (2.9s)</div>
+<div class="line out">-- Build files have been written to: fortran/build</div>
+<div class="line"><span class="prompt">[~/fortran]</span>cmake --build build</div>
+<div class="line out">...</div>
+<div class="line out">[6136/6136] Linking CXX executable bin/obj2yaml</div>
+</div>
+<p>Grab a cuppa<a href="#fn15" class="footnote-ref" id="fnref15" role="doc-noteref"><sup>15</sup></a>, this step uses a lot of resources and can take a <strong>very</strong> long time.</p>
+<div class="no-row-height column-margin column-container"><p><sup>15</sup>&nbsp;<strong>cuppa</strong> (/ˈkʌp.ə/): noun, informal, UK. A hot drink, usually tea or coffee.</p></div><section id="interlude-calling-fortran-subroutines-from-c" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="interlude-calling-fortran-subroutines-from-c">Interlude — Calling Fortran subroutines from C</h2>
+<p>While we wait for LLVM to build, start up a new terminal and we’ll remind ourselves how to compile and link a Fortran subroutine as part of a C program. The principles here will help us later when it comes to calling Fortran from JavaScript.</p>
+<p>First, let’s write a simple subroutine that takes in three integer arguments: <code>x</code>, <code>y</code>, and <code>z</code>. It will set the value of <code>z</code> to the sum of <code>x</code> and <code>y</code>. Name our new subroutine <code>foo</code> and save the file containing your subroutine as <code>foo.f08</code>.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>foo.f08</strong></pre>
+</div>
+<div class="sourceCode" id="cb1" data-filename="foo.f08"><pre class="sourceCode fortran code-with-copy"><code class="sourceCode fortranfixed"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SUBROUTINE</span> foo(x, y, z)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">IMPLICIT</span> <span class="kw">NONE</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">INTEGER</span>, <span class="dt">INTENT(IN)</span>  <span class="dt">::</span> x, y</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">INTEGER</span>, <span class="dt">INTENT(OUT)</span> <span class="dt">::</span> z</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    z <span class="kw">=</span> x <span class="kw">+</span> y</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">END</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice how, generally, Fortran routines pass arguments by reference and we can declare how an argument will be used in the subroutine using <code>INTENT()</code>. Assuming you already have a traditional Fortran compiler like <code>gfortran</code> installed<a href="#fn16" class="footnote-ref" id="fnref16" role="doc-noteref"><sup>16</sup></a>, compile the Fortran source into an object file.</p>
+<div class="no-row-height column-margin column-container"><p><sup>16</sup>&nbsp;You don’t <em>need</em> a native fortran compiler to follow along with the rest of the post, but if you’d like one you can get <code>gfortran</code> from your OS’s usual package manager as part of the GCC compiler suite. There’s also <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/fortran-compiler.html"><code>ifort</code></a>, if you’re on an Intel CPU.</p></div><div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>gfortran -c foo.f08 -o foo.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>file foo.o</div>
+<div class="line out">foo.o: Mach-O 64-bit object arm64</div>
+<div class="line"><span class="prompt">[~/fortran]</span>nm foo.o</div>
+<div class="line out">0000000000000038 s EH_frame1</div>
+<div class="line out">0000000000000000 T _foo_</div>
+<div class="line out">0000000000000000 t ltmp0</div>
+<div class="line out">0000000000000038 s ltmp1</div>
+</div>
+<p>I’m on an M1 macOS machine, so my resulting object is a Mach object for ARM. If you’re a Linux user, you should see something like <code>ELF 64-bit LSB shared object, x86-64</code>. I’ve also run <code>nm</code> to take a look at the names of the symbols in the object that the compiler has built. Keep an eye on the symbol for our subroutine — on my machine it’s named <code>_foo_</code>. The leading underscore is fairly standard, but the trailing underscore differs from what is usual for C procedures.</p>
+<p>Let’s write a C program that calls our Fortran subroutine<a href="#fn17" class="footnote-ref" id="fnref17" role="doc-noteref"><sup>17</sup></a>. Notice again how we pass the arguments by reference to the external symbol. Also, if your Fortran compiler added the trailing underscore, we’ll need to include it when we declare the symbol name in C.</p>
+<div class="no-row-height column-margin column-container"><p><sup>17</sup>&nbsp;Modern Fortran standards provide a Fortran module <a href="https://fortranwiki.org/fortran/show/iso_c_binding"><code>iso_c_binding</code></a> and a C header file <code>ISO_Fortran_binding.h</code> to improve C interoperability, but our code is going to be simple enough that we can do without those today.</p></div><div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>main.c</strong></pre>
+</div>
+<div class="sourceCode" id="cb2" data-filename="main.c"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> <span class="dt">void</span> foo_<span class="op">(</span><span class="dt">int</span><span class="op">*,</span> <span class="dt">int</span><span class="op">*,</span> <span class="dt">int</span><span class="op">*);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> y <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> z<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    foo_<span class="op">(&amp;</span>x<span class="op">,</span> <span class="op">&amp;</span>y<span class="op">,</span> <span class="op">&amp;</span>z<span class="op">);</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">"</span><span class="sc">%d</span><span class="st"> + </span><span class="sc">%d</span><span class="st"> = </span><span class="sc">%d\n</span><span class="st">"</span><span class="op">,</span> x<span class="op">,</span> y<span class="op">,</span> z<span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Compile the C source using <code>gcc</code> or equivalent, and then run the resulting binary to observe a truly staggering level of numerical computation.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>gcc main.c foo.o -o main</div>
+<div class="line"><span class="prompt">[~/fortran]</span>./main</div>
+<div class="line out">1 + 1 = 2</div>
+</div>
+</section>
+<section id="returning-to-llvm-flang" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="returning-to-llvm-flang">Returning to LLVM Flang</h2>
+<p>Once LLVM has finished compiling, the <code>flang-new</code> binary should be available in the directory <code>build/bin</code>. We can now run it and confirm that it has been set up to produce binaries for <code>wasm32</code> and Emscripten.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new --version</div>
+<div class="line out">flang-new version 18.1.1 (https://github.com/llvm/llvm-project.git dba2a75e9c7ef81fe84774ba5eee5e67e01d801a)</div>
+<div class="line out">Target: wasm32-unknown-emscripten</div>
+<div class="line out">Thread model: posix</div>
+<div class="line out">InstalledDir: .../fortran/build/bin</div>
+</div>
+<p>Great! Let’s try compiling our Fortran subroutine using our freshly built compiler.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new -c foo.f08 -o foo.o</div>
+<div class="line out">error: fortran/llvm-project/flang/lib/Optimizer/CodeGen/Target.cpp:1162:</div>
+<div class="line out">not yet implemented: target not implemented</div>
+<div class="line out">LLVM ERROR: aborting</div>
+</div>
+<p>Ah, not so great. The <code>wasm32-unknown-emscripten</code> target triple unfortunately hasn’t been implemented yet in the <code>flang-new</code> compiler.</p>
+<p>And so here comes our first patch to LLVM. We will implement the target by extending Flang’s list of known target specifics. The required changes, shown below as a diff, can be mostly deduced by looking at the other targets implemented in the file <code>flang/lib/Optimizer/CodeGen/Target.cpp</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode diff code-with-copy"><code class="sourceCode diff"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">diff --git a/flang/lib/Optimizer/CodeGen/Target.cpp b/flang/lib/Optimizer/CodeGen/Target.cpp</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>index 83e7fa9b440b..49e73ec48e0a 100644</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">--- a/flang/lib/Optimizer/CodeGen/Target.cpp</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">+++ b/flang/lib/Optimizer/CodeGen/Target.cpp</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -1109,6 +1109,44 @@ struct TargetLoongArch64 : public GenericTarget&lt;TargetLoongArch64&gt; {</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> };</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a> } // namespace</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="va">+//===----------------------------------------------------------------------===//</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="va">+// WebAssembly (wasm32) target specifics.</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="va">+//===----------------------------------------------------------------------===//</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="va">+</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="va">+namespace {</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="va">+struct TargetWasm32 : public GenericTarget&lt;TargetWasm32&gt; {</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="va">+  using GenericTarget::GenericTarget;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="va">+</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="va">+  static constexpr int defaultWidth = 32;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="va">+</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="va">+  CodeGenSpecifics::Marshalling</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="va">+  complexArgumentType(mlir::Location, mlir::Type eleTy) const override {</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="va">+    assert(fir::isa_real(eleTy));</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="va">+    CodeGenSpecifics::Marshalling marshal;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="va">+    // Use a type that will be translated into LLVM as:</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="va">+    // { t, t }   struct of 2 eleTy, byval, align 4</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="va">+    auto structTy =</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="va">+        mlir::TupleType::get(eleTy.getContext(), mlir::TypeRange{eleTy, eleTy});</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="va">+    marshal.emplace_back(fir::ReferenceType::get(structTy),</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="va">+                         AT{/*alignment=*/4, /*byval=*/true});</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="va">+    return marshal;</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="va">+  }</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="va">+</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="va">+  CodeGenSpecifics::Marshalling</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="va">+  complexReturnType(mlir::Location loc, mlir::Type eleTy) const override {</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="va">+    assert(fir::isa_real(eleTy));</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="va">+    CodeGenSpecifics::Marshalling marshal;</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="va">+    // Use a type that will be translated into LLVM as:</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="va">+    // { t, t }   struct of 2 eleTy, sret, align 4</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="va">+    auto structTy = mlir::TupleType::get(eleTy.getContext(),</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="va">+                                          mlir::TypeRange{eleTy, eleTy});</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="va">+    marshal.emplace_back(fir::ReferenceType::get(structTy),</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="va">+                          AT{/*alignment=*/4, /*byval=*/false, /*sret=*/true});</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="va">+    return marshal;</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="va">+  }</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="va">+};</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="va">+} // namespace</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="va">+</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a> // Instantiate the overloaded target instance based on the triple value.</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a> // TODO: Add other targets to this file as needed.</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a> std::unique_ptr&lt;fir::CodeGenSpecifics&gt;</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -1158,6 +1196,9 @@ fir::CodeGenSpecifics::get(mlir::MLIRContext *ctx, llvm::Triple &amp;&amp;trp,</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>   case llvm::Triple::ArchType::loongarch64:</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>     return std::make_unique&lt;TargetLoongArch64&gt;(ctx, std::move(trp),</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>                                                std::move(kindMap), dl);</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="va">+  case llvm::Triple::ArchType::wasm32:</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="va">+    return std::make_unique&lt;TargetWasm32&gt;(ctx, std::move(trp),</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="va">+                                               std::move(kindMap), dl);</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>   TODO(mlir::UnknownLoc::get(ctx), "target not implemented");</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a> }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Save the contents of the above diff as the file <code>add-wasm32-target.diff</code>, and then apply it to the <code>llvm-project</code> directory using <code>git</code> or the <code>patch</code> utility. Then, rebuild LLVM Flang. It should be quicker to build the second time, as most generated objects are unaffected by the change.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>patch -p1 -d llvm-project &lt; add-wasm32-target.diff</div>
+<div class="line"><span class="prompt">[~/fortran]</span>cmake --build build</div>
+<div class="line out">...</div>
+<div class="line out">[180/180] Generating ../../../../include/flang/ieee_arithmetic.mod</div>
+</div>
+<p>Once LLVM has been recompiled, try compiling our Fortran source once again.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new -c foo.f08 -o foo.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>file foo.o</div>
+<div class="line out">foo.o: WebAssembly (wasm) binary module version 0x1 (MVP)</div>
+<div class="line"><span class="prompt">[~/fortran]</span>llvm-nm foo.o</div>
+<div class="line out">00000001 T foo_</div>
+</div>
+<p>Success! We can confirm this is a real WebAssembly object using the <code>file</code> utility, and <code>llvm-nm</code><a href="#fn18" class="footnote-ref" id="fnref18" role="doc-noteref"><sup>18</sup></a> can see the <code>foo</code> symbol within, corresponding to our Fortran subroutine.</p>
+<div class="no-row-height column-margin column-container"><p><sup>18</sup>&nbsp;You might need to use a WebAssembly aware version of this tool from Emscripten. If you’re using <a href="https://github.com/emscripten-core/emsdk">emsdk</a>, ensure that <code>.../emsdk/upstream/bin/</code> is on your <code>$PATH</code>.</p><p><sup>19</sup>&nbsp;Here I’m using Node v18, but I think anything newer than Node v16 should work. Emscripten is bundled with a version of Node, but I like using <a href="https://github.com/nvm-sh/nvm">nvm</a> to manage my Node installations.</p></div><p>Let’s continue compiling our C function for WebAssembly using Emscripten and running it using Node<a href="#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a>. We should see the same output as with our native binary.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>emcc main.c foo.o -o main.js</div>
+<div class="line"><span class="prompt">[~/fortran]</span>node main.js</div>
+<div class="line out">1 + 1 = 2</div>
+</div>
+</section>
+<section id="interlude-calling-a-fortran-routine-from-javascript" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="interlude-calling-a-fortran-routine-from-javascript">Interlude — Calling a Fortran routine from JavaScript</h2>
+<p>In the previous section we used a C program to call Fortran code, but we don’t technically need to do that. If we tell Emscripten about the Fortran subroutine, we can call it directly from JavaScript without writing any C code.</p>
+<p>First, let’s link our Fortran object with Emscripten, producing a script that loads our WebAssembly binary into memory but does not execute any routines. In addition to our symbol <code>_foo_</code>, we’ll also export <code>_malloc</code> and <code>_free</code> so that we can use them from JavaScript<a href="#fn20" class="footnote-ref" id="fnref20" role="doc-noteref"><sup>20</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>20</sup>&nbsp;See the <a href="https://emscripten.org/docs/tools_reference/settings_reference.html">Emscripten documentation</a> for more details about <code>emcc</code> command line options. By the way, if you’ve not used Emscripten much before you might see extra <code>cache:INFO</code> lines emitted during various steps in this post. They are nothing to worry about and can be ignored.</p></div><div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>emcc foo.o -sEXPORTED_FUNCTIONS=_foo_,_malloc,_free -o foo.js</div>
+<div class="line out">cache:INFO: generating system asset: symbol_lists/ae47d07bfa3321ac4dde96bd87821b4aa93f9a19.json... (this will be cached in ".../emsdk/upstream/emscripten/cache/symbol_lists/ae47d07bfa3321ac4dde96bd87821b4aa93f9a19.json" for subsequent builds)</div>
+<div class="line out">cache:INFO:  - ok</div>
+<div class="line"><span class="prompt">[~/fortran]</span>node foo.js</div>
+<div class="line"><span class="prompt">[~/fortran]</span></div>
+</div>
+<p>Notice that when we run the script <code>foo.js</code> directly… nothing happens.</p>
+<p>Next, we’ll write a JavaScript file that loads <code>foo.js</code> and then calls our Fortran subroutine. We’ll need to allocate some memory to hold our integers <code>x</code>, <code>y</code> and <code>z</code> using the exported <code>_malloc()</code> function. We’ll also need to set our input arguments <code>x</code> and <code>y</code> to some integer values, and we can do that by setting values in the allocated WebAssembly memory through <code>Module.HEAPU32</code><a href="#fn21" class="footnote-ref" id="fnref21" role="doc-noteref"><sup>21</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>21</sup>&nbsp;Alternatively, see the <a href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#access-memory-from-javascript"><code>setValue()</code> and <code>getValue()</code> functions in the Emscripten API</a>.</p></div><div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>standalone.js</strong></pre>
+</div>
+<div class="sourceCode" id="cb4" data-filename="standalone.js"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> Module <span class="op">=</span> <span class="pp">require</span>(<span class="st">'./foo.js'</span>)<span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">setTimeout</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> x <span class="op">=</span> Module<span class="op">.</span><span class="fu">_malloc</span>(<span class="dv">4</span>)<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> y <span class="op">=</span> Module<span class="op">.</span><span class="fu">_malloc</span>(<span class="dv">4</span>)<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> z <span class="op">=</span> Module<span class="op">.</span><span class="fu">_malloc</span>(<span class="dv">4</span>)<span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  Module<span class="op">.</span><span class="at">HEAPU32</span>[x <span class="op">/</span> <span class="dv">4</span>] <span class="op">=</span> <span class="dv">123</span><span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  Module<span class="op">.</span><span class="at">HEAPU32</span>[y <span class="op">/</span> <span class="dv">4</span>] <span class="op">=</span> <span class="dv">456</span><span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  Module<span class="op">.</span><span class="fu">_foo_</span>(x<span class="op">,</span> y<span class="op">,</span> z)<span class="op">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"x = "</span><span class="op">,</span> Module<span class="op">.</span><span class="at">HEAP32</span>[x <span class="op">/</span> <span class="dv">4</span>])<span class="op">;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"y = "</span><span class="op">,</span> Module<span class="op">.</span><span class="at">HEAP32</span>[y <span class="op">/</span> <span class="dv">4</span>])<span class="op">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"x + y = "</span><span class="op">,</span> Module<span class="op">.</span><span class="at">HEAP32</span>[z <span class="op">/</span> <span class="dv">4</span>])<span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  Module<span class="op">.</span><span class="fu">_free</span>(x)<span class="op">;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  Module<span class="op">.</span><span class="fu">_free</span>(y)<span class="op">;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  Module<span class="op">.</span><span class="fu">_free</span>(z)<span class="op">;</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> <span class="dv">100</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>node standalone.js</div>
+<div class="line">x =  123</div>
+<div class="line">y =  456</div>
+<div class="line">x + y =  579</div>
+</div>
+<p>You should also be able to run the resulting WebAssembly binary in a web browser. Remove the line <code class="sourceCode javascript"><span class="kw">var</span> Module <span class="op">=</span> <span class="pp">require</span>(<span class="st">'./foo.js'</span>)<span class="op">;</span></code> from <code>standalone.js</code>, and instead load the script <code>foo.js</code> in your HTML.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>index.html</strong></pre>
+</div>
+<div class="sourceCode" id="cb5" data-filename="index.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Fortran Demo<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">script</span><span class="ot"> src</span><span class="op">=</span><span class="st">"foo.js"</span><span class="dt">&gt;&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">script</span><span class="ot"> src</span><span class="op">=</span><span class="st">"standalone.js"</span><span class="dt">&gt;&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Spin up a local web server<a href="#fn22" class="footnote-ref" id="fnref22" role="doc-noteref"><sup>22</sup></a>, visit the page, and the same output should be seen in the browser’s JavaScript console.</p>
+<div class="no-row-height column-margin column-container"><p><sup>22</sup>&nbsp;Something like <code>Rscript -e 'httpuv::runStaticServer()'</code> or <code>python3 -m http.server</code> should work well.</p></div></section>
+<section id="the-fortran-runtime-library-a-journey-to-hello-world" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-fortran-runtime-library-a-journey-to-hello-world">The Fortran runtime library: A journey to “Hello, World!”</h2>
+<p>The ubiquitous “Hello, World!” test program is the usual way to introduce a programming language, but I didn’t introduce Fortran using such a program above. As you’ll see, that was for a good reason. Let’s see what happens when we try to build a “Hello, World!” subroutine in Fortran and call it from C. As before, we’ll compile the Fortran object using <code>flang-new</code> and use Emscripten to compile and link the C code.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>hello.f08</strong></pre>
+</div>
+<div class="sourceCode" id="cb6" data-filename="hello.f08"><pre class="sourceCode fortran code-with-copy"><code class="sourceCode fortranfixed"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SUBROUTINE</span> hello()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">IMPLICIT</span> <span class="kw">NONE</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">PRINT</span> <span class="kw">*</span>, <span class="st">"Hello, World!"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">END</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>hello.c</strong></pre>
+</div>
+<div class="sourceCode" id="cb7" data-filename="hello.c"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> <span class="dt">void</span> hello_<span class="op">();</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    hello_<span class="op">();</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new -c hello.f08 -o hello.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>emcc hello.c hello.o -o hello.js</div>
+<div class="line out">wasm-ld: error: hello.o: undefined symbol: _FortranAioBeginExternalListOutput</div>
+<div class="line out">wasm-ld: error: hello.o: undefined symbol: _FortranAioOutputAscii</div>
+<div class="line out">wasm-ld: error: hello.o: undefined symbol: _FortranAioEndIoStatement</div>
+<div class="line out">emcc: error: 'wasm-ld -o hello.wasm [...] --no-entry --stack-first --table-base=1' failed (returned 1)</div>
+</div>
+<p>The build failed due to some missing symbols. This is a consequence of a more general issue in that we have not yet compiled the LLVM Fortran runtime library for WebAssembly. There are a bunch of library symbols that we’re currently missing, including some functions that are required to print output!<a href="#fn23" class="footnote-ref" id="fnref23" role="doc-noteref"><sup>23</sup></a></p>
+<div class="no-row-height column-margin column-container"><p><sup>23</sup>&nbsp;See <a href="https://flang.llvm.org/docs/IORuntimeInternals.html">LLVM Flang’s documentation</a> for the nuts and bolts of the Fortran IO runtime library implementation.</p></div><p>Luckily, the runtime library is written in C++ as part of the LLVM source tree at <code>llvm-project/flang/runtime</code>. So, in principle, all we need to do is build the library using Emscripten’s <code>em++</code> compiler and then link to it whenever we’re using Fortran code in our WebAssembly program.</p>
+<p>Here is a <code>Makefile</code> designed to make this step easy. Save it<a href="#fn24" class="footnote-ref" id="fnref24" role="doc-noteref"><sup>24</sup></a> in the current directory and then run <code>make</code>. It should go ahead and use the version of Emscripten on your path to build a static Fortran runtime library at <code>build/flang/runtime/libFortranRuntime.a</code>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>24</sup>&nbsp;Be sure to indent the rules in this file using tabs, not spaces.</p></div><div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>Makefile</strong></pre>
+</div>
+<div class="sourceCode" id="cb8" data-filename="Makefile"><pre class="sourceCode makefile code-with-copy"><code class="sourceCode makefile"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">ROOT</span> <span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">abspath</span><span class="st"> .</span><span class="ch">)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">SOURCE</span> <span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">ROOT</span><span class="ch">)</span><span class="st">/llvm-project</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">BUILD</span> <span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">ROOT</span><span class="ch">)</span><span class="st">/build</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_SOURCES</span> <span class="ch">:=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">wildcard</span><span class="st"> </span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="st">/flang/runtime/*.cpp</span><span class="ch">)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_SOURCES</span> <span class="ch">+=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="st">/flang/lib/Decimal/decimal-to-binary.cpp</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_SOURCES</span> <span class="ch">+=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="st">/flang/lib/Decimal/binary-to-decimal.cpp</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_OBJECTS</span> <span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">patsubst</span><span class="st"> </span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="st">/%</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">BUILD</span><span class="ch">)</span><span class="st">/%</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">RUNTIME_SOURCES</span><span class="kw">:</span><span class="ss">.cpp</span><span class="kw">=</span><span class="ss">.o</span><span class="ch">))</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_CXXFLAGS</span> <span class="ch">+=</span><span class="st"> -I</span><span class="ch">$(</span><span class="dt">BUILD</span><span class="ch">)</span><span class="st">/include -I</span><span class="ch">$(</span><span class="dt">BUILD</span><span class="ch">)</span><span class="st">/tools/flang/runtime</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_CXXFLAGS</span> <span class="ch">+=</span><span class="st"> -I</span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="st">/flang/include -I</span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="st">/llvm/include</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_CXXFLAGS</span> <span class="ch">+=</span><span class="st"> -DFLANG_LITTLE_ENDIAN</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_CXXFLAGS</span> <span class="ch">+=</span><span class="st"> -fPIC -Wno-c++11-narrowing -fvisibility=hidden</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_CXXFLAGS</span> <span class="ch">+=</span><span class="st"> -DFE_UNDERFLOW=0 -DFE_OVERFLOW=0 -DFE_INEXACT=0</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="dt">RUNTIME_CXXFLAGS</span> <span class="ch">+=</span><span class="st"> -DFE_INVALID=0 -DFE_DIVBYZERO=0 -DFE_ALL_EXCEPT=0</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="dv">$(BUILD)/flang/runtime/libFortranRuntime.a:</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">RUNTIME_OBJECTS</span><span class="ch">)</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="er">    </span><span class="ch">@</span><span class="fu">rm -f </span><span class="ch">$@</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    emar -rcs <span class="ch">$@</span> <span class="ch">$^</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="dv">$(BUILD)%.o :</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">SOURCE</span><span class="ch">)</span><span class="dt">%.cpp</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="er">    </span><span class="ch">@</span><span class="fu">mkdir -p </span><span class="ch">$(</span><span class="dt">@D</span><span class="ch">)</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    em++ <span class="ch">$(</span><span class="dt">RUNTIME_CXXFLAGS</span><span class="ch">)</span> -o <span class="ch">$@</span> -c <span class="ch">$&lt;</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="ot">.PHONY:</span><span class="dt"> clean</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="dv">clean:</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="er">    </span><span class="ch">@</span><span class="fu">rm </span><span class="ch">$(</span><span class="dt">RUNTIME_OBJECTS</span><span class="ch">)</span><span class="fu"> </span><span class="ch">$(</span><span class="dt">BUILD</span><span class="ch">)</span><span class="fu">/flang/runtime/libFortranRuntime.a</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>make</div>
+<div class="line out">em++ .../ISO_Fortran_binding.o -c .../ISO_Fortran_binding.cpp</div>
+<div class="line out">em++ .../allocatable.o -c .../allocatable.cpp</div>
+<div class="line out">em++ .../array-constructor.o -c .../array-constructor.cpp</div>
+<div class="line out">...</div>
+<div class="line out">emar -rcs build/flang/runtime/libFortranRuntime.a .../binary-to-decimal.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>file build/flang/runtime/libFortranRuntime.a</div>
+<div class="line out">build/flang/runtime/libFortranRuntime.a: current ar archive</div>
+</div>
+<p>Let’s try again, linking in our shiny new library as part of the Emscripten build step.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new -c hello.f08 -o hello.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>emcc hello.c hello.o build/flang/runtime/libFortranRuntime.a -o hello.js</div>
+<div class="line out">wasm-ld: <span class="purple">warning:</span> function signature mismatch: _FortranAioOutputAscii</div>
+<div class="line out">&gt;&gt;&gt; defined as (i32, i32, i64) -&gt; i32 in hello.o</div>
+<div class="line out">&gt;&gt;&gt; defined as (i32, i32, i32) -&gt; i32 in build/flang/runtime/libFortranRuntime.a(io-api.o)</div>
+</div>
+<p>Success? Not quite. A warning is issued, letting us know about a signature mismatch. Emscripten has compiled the symbol <code>_FortranAioOutputAscii</code> to take three <code>i32</code> arguments<a href="#fn25" class="footnote-ref" id="fnref25" role="doc-noteref"><sup>25</sup></a>. However, <code>flang-new</code> has compiled <code>hello.f08</code> with the expectation that the symbol takes two <code>i32</code> arguments and a single <code>i64</code> argument.</p>
+<div class="no-row-height column-margin column-container"><p><sup>25</sup>&nbsp;This is <a href="https://llvm.org/docs/LangRef.html#integer-type">LLVM IR notation</a>, meaning an integer of size 32 bits.</p><p><sup>26</sup>&nbsp;This continues to crop up when compiling R packages for webR. Package authors or vendored libraries may have used tools such as <code>f2c</code> that declare a Fortran <code>SUBROUTINE</code> to return an <code>int</code>, while other libraries might declare a Fortran <code>SUBROUTINE</code> to return <code>void</code>. Who is right? I’m not sure, as I understand it early Fortran did not have a standard interface to C. Personally, I think returning <code>void</code> makes most sense.</p></div><p>This is unfortunate. Despite being emitted as just a warning, if you try running the emitted program using Node you will see that the problem is catastrophic. WebAssembly, unlike a lot of target systems, absolutely requires that symbols defined over multiple compilation units have consistent function signatures, both in argument and return type<a href="#fn26" class="footnote-ref" id="fnref26" role="doc-noteref"><sup>26</sup></a>.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>node hello.js</div>
+<div class="line out">.../fortran/hello.js:128</div>
+<div class="line out">&nbsp;&nbsp;&nbsp;&nbsp;throw ex;</div>
+<div class="line out">&nbsp;&nbsp;&nbsp;&nbsp;^</div>
+<div class="line out">RuntimeError: unreachable</div>
+<div class="line out">&nbsp;&nbsp;at wasm://wasm/001a0366:wasm-function[20]:0x15d9</div>
+<div class="line out">&nbsp;&nbsp;at removeRunDependency (/Users/georgestagg/fortran/hello.js:630:7)</div>
+<div class="line out"></div>
+<div class="line out">Node.js v18.18.0</div>
+</div>
+<p>Rather than going over the debugging process that eventually leads us to what is going on here, let me point you directly to the cause of the problem. Take a look at this comment from the LLVM source:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>flang/include/flang/Optimizer/Builder/Runtime/RTBuilder.h</strong></pre>
+</div>
+<div class="sourceCode" id="cb9" data-filename="flang/include/flang/Optimizer/Builder/Runtime/RTBuilder.h"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">//===----------------------------------------------------------------------===//</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Type builder models</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">//===----------------------------------------------------------------------===//</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">// </span><span class="al">TODO</span><span class="co">: all usages of sizeof in this file assume build ==  host == target.</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">// This will need to be re-visited for cross compilation.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">/// Return a function that returns the type signature model for the type `T`</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">/// when provided an MLIRContext*. This allows one to translate C(++) function</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">/// signatures from runtime header files to MLIR signatures into a static table</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">/// at compile-time.</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">///</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">/// For example, when `T` is `int`, return a function that returns the MLIR</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">/// standard type `i32` when `sizeof(int)` is 4.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And therein lies the problem. For us, the host is different to the target, breaking assumptions in the LLVM source code. Surprisingly, this does not cause as much chaos as you might expect. From what I can tell, this machinery is used only to make the Fortran runtime library functions, written in C++, available to Fortran. There is a compile-time calculation using <code>sizeof()</code>, and since most of the sizes match anyway<a href="#fn27" class="footnote-ref" id="fnref27" role="doc-noteref"><sup>27</sup></a> it mostly works fine.</p>
+<div class="no-row-height column-margin column-container"><p><sup>27</sup>&nbsp;The <a href="https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models">C data model</a> for the host and target defines how many bits certain fundamental C types are represented with. The specific sizes can differ based on the hardware architecture and your OS.</p></div><p>Unfortunately for us, assuming you’re following along on a modern 64-bit Unix-like system such as Linux or macOS, the sizes don’t match for the <code>long</code> data type. The result of <code>sizeof(long)</code> on our compiler’s host platform is 8 bytes (<code>i64</code>), but for the target platform of <code>wasm32-unknown-emscripten</code> the returned value should be 4 bytes (<code>i32</code>).</p>
+<p>When we compile the Fortran runtime library C++ code using Emscripten, things are fine. The resulting symbols are compiled with signatures such that <code>long</code> arguments are <code>i32</code>. However, when we compile our Fortran code with <code>flang-new</code> the external library symbols are declared such that <code>long</code> arguments are <code>i64</code>. This difference leads to the inconsistent function signature warning and runtime failure.</p>
+<p>Why did using <code>PRINT()</code> in our “Hello, World!” program invoke a function that takes an argument of type <code>long</code>? Well, in some implementations of Fortran there are so-called “hidden” arguments that are added whenever you pass a Fortran <code>CHARACTER</code> type to a function or subroutine. These extra arguments pass in the length of the strings. In the Fortran runtime library the hidden arguments are declared with type <code>size_t</code> which, following a chain of <code>typedef</code>s, ends up being the same as <code>unsigned long</code>. This hidden implicit argument is the one with inconsistent size.</p>
+</section>
+<section id="hacking-around-the-issue" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="hacking-around-the-issue">Hacking around the issue</h2>
+<p>Unfortunately, I don’t know enough about the LLVM or Flang internals to implement a real solution to this problem. Ideally, <code>flang-new</code> would emit the correct use of <code>i32</code> or <code>i64</code> for the target architecture and data model when cross-compiling, no matter the host architecture the compiler is running on.</p>
+<p>Since I can’t solve this today, let’s hack around it for now. We’ll build a version of <code>flang-new</code> with the size of a <code>long</code> hard-coded to what we need for <code>wasm32</code> and Emscripten. We’ll also make some changes so that calls to <code>malloc()</code> from Fortran are emitted with an <code>i32</code> argument<a href="#fn28" class="footnote-ref" id="fnref28" role="doc-noteref"><sup>28</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>28</sup>&nbsp;This additionally fixes dynamic allocation with <code>ALLOCATE()</code>, a feature introduced in Fortran 90.</p></div><p>The required patches are again shown as a diff below. If you’re following along, save it as a file named <code>force-4-byte-values.diff</code> and apply it to the <code>llvm-project</code> directory using <code>git</code> or the <code>patch</code> utility. Finally, recompile <code>flang-new</code> once more.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>force-4-byte-values.diff</strong></pre>
+</div>
+<div class="sourceCode" id="cb10" data-filename="force-4-byte-values.diff"><pre class="sourceCode diff code-with-copy"><code class="sourceCode diff"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">diff --git a/flang/include/flang/Optimizer/Builder/Runtime/RTBuilder.h b/flang/include/flang/Optimizer/Builder/Runtime/RTBuilder.h</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>index b3fe52f4b..c3c7326da 100644</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">--- a/flang/include/flang/Optimizer/Builder/Runtime/RTBuilder.h</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="dt">+++ b/flang/include/flang/Optimizer/Builder/Runtime/RTBuilder.h</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -146,7 +146,7 @@ constexpr TypeBuilderFunc getModel&lt;void **&gt;() {</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a> template &lt;&gt;</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a> constexpr TypeBuilderFunc getModel&lt;long&gt;() {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>   return [](mlir::MLIRContext *context) -&gt; mlir::Type {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">-    return mlir::IntegerType::get(context, 8 * sizeof(long));</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="va">+    return mlir::IntegerType::get(context, 8 * 4);</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>   };</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a> }</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a> template &lt;&gt;</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -187,7 +187,7 @@ constexpr TypeBuilderFunc getModel&lt;long long *&gt;() {</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a> template &lt;&gt;</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a> constexpr TypeBuilderFunc getModel&lt;unsigned long&gt;() {</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>   return [](mlir::MLIRContext *context) -&gt; mlir::Type {</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="st">-    return mlir::IntegerType::get(context, 8 * sizeof(unsigned long));</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="va">+    return mlir::IntegerType::get(context, 8 * 4);</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>   };</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a> }</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a> template &lt;&gt;</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="kw">diff --git a/flang/lib/Optimizer/CodeGen/CodeGen.cpp b/flang/lib/Optimizer/CodeGen/CodeGen.cpp</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>index ba5946415..2931753a8 100644</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="dt">--- a/flang/lib/Optimizer/CodeGen/CodeGen.cpp</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="dt">+++ b/flang/lib/Optimizer/CodeGen/CodeGen.cpp</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -1225,7 +1225,7 @@ getMalloc(fir::AllocMemOp op, mlir::ConversionPatternRewriter &amp;rewriter) {</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>     return mlir::SymbolRefAttr::get(userMalloc);</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>   mlir::OpBuilder moduleBuilder(</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>       op-&gt;getParentOfType&lt;mlir::ModuleOp&gt;().getBodyRegion());</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="st">-  auto indexType = mlir::IntegerType::get(op.getContext(), 64);</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="va">+  auto indexType = mlir::IntegerType::get(op.getContext(), 32);</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>   auto mallocDecl = moduleBuilder.create&lt;mlir::LLVM::LLVMFuncOp&gt;(</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>       op.getLoc(), mallocName,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>       mlir::LLVM::LLVMFunctionType::get(getLlvmPtrType(op.getContext()),</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -1281,6 +1281,7 @@ struct AllocMemOpConversion : public FIROpConversion&lt;fir::AllocMemOp&gt; {</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>     mlir::Type heapTy = heap.getType();</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>     mlir::Location loc = heap.getLoc();</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>     auto ity = lowerTy().indexType();</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="va">+    auto i32ty = mlir::IntegerType::get(rewriter.getContext(), 32);</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>     mlir::Type dataTy = fir::unwrapRefType(heapTy);</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>     mlir::Type llvmObjectTy = convertObjectType(dataTy);</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>     if (fir::isRecordWithTypeParameters(fir::unwrapSequenceType(dataTy)))</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -1291,9 +1292,10 @@ struct AllocMemOpConversion : public FIROpConversion&lt;fir::AllocMemOp&gt; {</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>     for (mlir::Value opnd : adaptor.getOperands())</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>       size = rewriter.create&lt;mlir::LLVM::MulOp&gt;(</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>           loc, ity, size, integerCast(loc, rewriter, ity, opnd));</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="va">+    auto size_i32 = integerCast(loc, rewriter, i32ty, size);</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>     heap-&gt;setAttr("callee", getMalloc(heap, rewriter));</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>     rewriter.replaceOpWithNewOp&lt;mlir::LLVM::CallOp&gt;(</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="st">-        heap, ::getLlvmPtrType(heap.getContext()), size, heap-&gt;getAttrs());</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="va">+        heap, ::getLlvmPtrType(heap.getContext()), size_i32, heap-&gt;getAttrs());</span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>     return mlir::success();</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>   }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>patch -p1 -d llvm-project &lt; force-4-byte-values.diff</div>
+<div class="line"><span class="prompt">[~/fortran]</span>cmake --build build</div>
+<div class="line out">[0/60] Building CXX object tools/flang/lib/Lower/Runtime.cpp.o</div>
+<div class="line out">...</div>
+<div class="line out">[49/49] Generating ../../../../include/flang/ieee_arithmetic.f18.mod</div>
+</div>
+<p>Once LLVM has been rebuilt, try compiling our program once again. This time, it should compile without any warnings and successfully run under Node:</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new -c hello.f08 -o hello.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>emcc hello.c hello.o build/flang/runtime/libFortranRuntime.a -o hello.js</div><div class="line"><span class="prompt">[~/fortran]</span>node hello.js</div>
+<div class="line out"> Hello, World!</div>
+</div>
+</section>
+</section>
+<section id="compiling-blas-and-lapack-for-webassembly" class="level1 page-columns page-full">
+<h1>Compiling BLAS and LAPACK for WebAssembly</h1>
+<p>Now that we have a Fortran compiler that can output WebAssembly objects, let’s build some Fortran projects. <a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms">BLAS</a> (Basic Linear Algebra Subprograms) is a set of low-level routines that perform many common operations in linear algebra, including tools for matrix and vector multiplication. They are a de facto standard in numerical computation, with several different implementations of the BLAS routines available. Some implementations have been tuned for use on certain hardware<a href="#fn29" class="footnote-ref" id="fnref29" role="doc-noteref"><sup>29</sup></a>, others have been well optimised on account of being around for a long time — the original BLAS routines were released in 1979!</p>
+<div class="no-row-height column-margin column-container"><p><sup>29</sup>&nbsp;See, for example, the <a href="https://www.intel.com/content/www/us/en/docs/onemkl/get-started-guide/2024-0/overview.html">Intel Math Kernel Library</a>.</p><p><sup>30</sup>&nbsp;Considered to be in the public domain. The actual <a href="https://www.netlib.org/blas/#_licensing">licence terms</a> are short and say that it is a “freely-available software package”.</p></div><p>Let’s grab a copy of the latest release of the so-called “reference implementation” of BLAS<a href="#fn30" class="footnote-ref" id="fnref30" role="doc-noteref"><sup>30</sup></a>, written in Fortran 90, and compile it using the patched LLVM we built above.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>curl -L https://www.netlib.org/blas/blas-3.12.0.tgz &gt; blas-3.12.0.tgz</div>
+<div class="line out" style="white-space: pre;">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div>
+<div class="line out" style="white-space: pre;">                                 Dload  Upload   Total   Spent    Left  Speed</div>
+<div class="line out" style="white-space: pre;">100  323k  100  323k    0     0   317k      0  0:00:01  0:00:01 --:--:--  317k</div>
+<div class="line"><span class="prompt">[~/fortran]</span>tar xzf blas-3.12.0.tgz</div>
+</div>
+<p>We’ll need to modify <code>BLAS-3.12.0/make.inc</code> to tell it about our version of <code>flang-new</code> and the Emscripten tools. Modify the following settings, leaving the other lines in that file as they are, then build BLAS using <code>make</code>.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>BLAS-3.12.0/make.inc</strong></pre>
+</div>
+<div class="sourceCode" id="cb11" data-filename="BLAS-3.12.0/make.inc"><pre class="sourceCode makefile code-with-copy"><code class="sourceCode makefile"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">FC</span> <span class="ch">=</span><span class="st"> ../build/bin/flang-new</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">FFLAGS</span> <span class="ch">=</span><span class="st"> -O2</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">FFLAGS_NOOPT</span> <span class="ch">=</span><span class="st"> -O0</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="dt">AR</span> <span class="ch">=</span><span class="st"> emar</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="dt">RANLIB</span> <span class="ch">=</span><span class="st"> emranlib</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>cd BLAS-3.12.0</div>
+<div class="line"><span class="prompt">[~/fortran/BLAS-3.12.0]</span>make</div>
+<div class="line out">../build/bin/flang-new -O2  -c -o isamax.o isamax.f</div>
+<div class="line out">../build/bin/flang-new -O2  -c -o sasum.o sasum.f</div>
+<div class="line out">...</div>
+<div class="line out">emar cr blas_LINUX.a isamax.o ... xerbla_array.o</div>
+<div class="line out">emranlib blas_LINUX.a</div>
+<div class="line"><span class="prompt">[~/fortran/BLAS-3.12.0]</span>cd ..</div>
+<div class="line"><span class="prompt">[~/fortran]</span></div>
+</div>
+<p>That went pretty well! Let’s try using it in a Fortran subroutine compiled for WebAssembly. For fun, we’ll try working with double precision complex numbers. We’ll use the BLAS level 2 routine <a href="https://netlib.org/lapack/explore-html-3.6.1/dc/dc1/group__complex16__blas__level2_gafaeb2abd9fffa7442b938dc384aeaf47.html#gafaeb2abd9fffa7442b938dc384aeaf47"><code>ZGEMV()</code></a>, which performs the matrix-vector operation</p>
+<p><span class="math display">\[\begin{equation}
+\mathbf{y} \leftarrow \alpha\mathbf{A}\mathbf{x} + \beta\mathbf{y},
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are scalar constants, <span class="math inline">\(\mathbf{x}\)</span> and <span class="math inline">\(\mathbf{y}\)</span> are vectors, and <span class="math inline">\(\mathbf{A}\)</span> is a matrix. Our Fortran routine will take in <code>alpha</code>, <code>beta</code>, <code>A</code>, <code>X</code>, and <code>Y</code>, with a fixed parameter <code>N</code> so that <span class="math inline">\(\mathbf{A}\)</span> is a square matrix with three rows and columns. The result is written back into <span class="math inline">\(\mathbf{y}\)</span>, so we declare that <code>Y</code> is of intent <code>INOUT</code>.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>bar.f08</strong></pre>
+</div>
+<div class="sourceCode" id="cb12" data-filename="bar.f08"><pre class="sourceCode fortran code-with-copy"><code class="sourceCode fortranfixed"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SUBROUTINE</span> bar(alpha, A, X, beta, Y)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">IMPLICIT</span> <span class="kw">NONE</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">INTEGER</span>, <span class="dt">PARAMETER</span> <span class="dt">::</span> N <span class="kw">=</span> <span class="dv">3</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">COMPLEX(KIND=8)</span>, <span class="dt">INTENT(IN)</span> <span class="dt">::</span> alpha, beta, A(N,N), X(N)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">COMPLEX(KIND=8)</span>, <span class="dt">INTENT(INOUT)</span> <span class="dt">::</span> Y(N)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">EXTERNAL</span> zgemv</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">CALL</span> zgemv(<span class="st">'N'</span>, N, N, alpha, A, N, X, <span class="dv">1</span>, beta, Y, <span class="dv">1</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="kw">END</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice how with some BLAS routines, <code>CHARACTER</code> strings of length one control configuration settings. Here, we pass <code>'N'</code> as the first argument. It is one of the reasons we spent time and care above building a version of <code>flang-new</code> that can deal with <code>CHARACTER</code> arguments and their hidden implicit length arguments for the <code>wasm32</code> target.</p>
+<p>Next, we’ll write a C program to create some complex variables, send them to Fortran and BLAS for processing, and print the result. This will let us know both that passing double precision complex numbers to Fortran and calling BLAS routines works as expected.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>bar.c</strong></pre>
+</div>
+<div class="sourceCode" id="cb13" data-filename="bar.c"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;complex.h&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> <span class="dt">void</span> bar_<span class="op">(</span><span class="dt">double</span> <span class="dt">complex</span><span class="op">*,</span> <span class="dt">double</span> <span class="dt">complex</span><span class="op">*,</span> <span class="dt">double</span> <span class="dt">complex</span><span class="op">*,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                 <span class="dt">double</span> <span class="dt">complex</span><span class="op">*,</span> <span class="dt">double</span> <span class="dt">complex</span><span class="op">*);</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> <span class="dt">complex</span> alpha <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> <span class="dt">complex</span> beta <span class="op">=</span> <span class="fl">2.</span><span class="op">*</span>I<span class="op">;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> <span class="dt">complex</span> A<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.</span><span class="op">*</span>I<span class="op">,</span> <span class="fl">4.</span>  <span class="op">,</span> <span class="fl">5.</span><span class="op">,</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="fl">7.</span>  <span class="op">,</span> <span class="fl">2.</span><span class="op">*</span>I<span class="op">,</span> <span class="fl">6.</span><span class="op">,</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fl">8.</span>  <span class="op">,</span> <span class="fl">9.</span>  <span class="op">,</span> <span class="fl">3.</span><span class="op">*</span>I</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> <span class="dt">complex</span> X<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">,</span> <span class="fl">2.</span> <span class="op">};</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> <span class="dt">complex</span> Y<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span> <span class="fl">3.</span><span class="op">,</span> <span class="fl">4.</span><span class="op">,</span> <span class="fl">5.</span> <span class="op">};</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  bar_<span class="op">(&amp;</span>alpha<span class="op">,</span> A<span class="op">,</span> X<span class="op">,</span> <span class="op">&amp;</span>beta<span class="op">,</span> Y<span class="op">);</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">"Y[0]: </span><span class="sc">%f</span><span class="st"> + </span><span class="sc">%f</span><span class="st">i, Y[1]: </span><span class="sc">%f</span><span class="st"> + </span><span class="sc">%f</span><span class="st">i, Y[2]: </span><span class="sc">%f</span><span class="st"> + </span><span class="sc">%f</span><span class="st">i</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>         creal<span class="op">(</span>Y<span class="op">[</span><span class="dv">0</span><span class="op">]),</span> cimag<span class="op">(</span>Y<span class="op">[</span><span class="dv">0</span><span class="op">]),</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>         creal<span class="op">(</span>Y<span class="op">[</span><span class="dv">1</span><span class="op">]),</span> cimag<span class="op">(</span>Y<span class="op">[</span><span class="dv">1</span><span class="op">]),</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>         creal<span class="op">(</span>Y<span class="op">[</span><span class="dv">2</span><span class="op">]),</span> cimag<span class="op">(</span>Y<span class="op">[</span><span class="dv">2</span><span class="op">]));</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>./build/bin/flang-new -c bar.f08 -o bar.o</div>
+<div class="line"><span class="prompt">[~/fortran]</span>emcc bar.c bar.o build/flang/runtime/libFortranRuntime.a BLAS-3.12.0/blas_LINUX.a -o bar.js</div>
+<div class="line"><span class="prompt">[~/fortran]</span>node bar.js</div>
+<div class="line out">Y[0]: 23.000000 + 6.000000i, Y[1]: 18.000000 + 10.000000i, Y[2]: 6.000000 + 16.000000i</div>
+</div>
+<p>And there we have it: BLAS compiled from Fortran 90 sources and running under WebAssembly! To finish up, let’s confirm for ourselves that this output is correct<a href="#fn31" class="footnote-ref" id="fnref31" role="doc-noteref"><sup>31</sup></a>,</p>
+<div class="no-row-height column-margin column-container"><p><sup>31</sup>&nbsp;Keeping in mind Fortran’s column-major array layout.</p></div><p><span class="math display">\[\begin{equation}
+\begin{split}
+\alpha\mathbf{A}\mathbf{x} &amp; + \beta\mathbf{y} \\[0.5em]
+&amp; =
+\begin{pmatrix}
+  i &amp; 7 &amp; 8\\
+  4 &amp; 2i &amp; 9\\
+  5 &amp; 6 &amp; 3i
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+  0\\1\\2
+\end{pmatrix}
++ 2i
+\begin{pmatrix}
+  3\\4\\5
+\end{pmatrix}\\[0.5em]
+&amp; =
+\begin{pmatrix}
+  23+6i\\18+10i\\6+16i
+\end{pmatrix}.
+\end{split}
+\end{equation}\]</span></p>
+<section id="mnist" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="mnist">Example: A handwritten digit classifier</h2>
+<p>The following demo uses a <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">multi-layer perceptron (MLP)</a> artificial neural network to classify hand-drawn digits. Try it out with your mouse or touchscreen! Just draw a digit from 0-9 in the box, and the classifier will try to label what digit you wrote. The relative probabilities according to the network are shown in a plot on the right.</p>
+<div class="column-page" id="mnist">
+<iframe src="https://georgestagg.github.io/mnist-classifier-blas-wasm/"></iframe>
+</div>
+<p>It’s not a perfect model, but it works fairly well for me! The weights powering the model have been pre-trained using Python, but the classification is performed at runtime using JavaScript and WebAssembly, running in your browser right now.</p>
+<p>With an MLP network, the classification process is essentially a repeated application of matrix-vector addition and multiplication. In this demo the heavy lifting is done by a single Fortran subroutine making use of the BLAS level 2 routine <a href="https://netlib.org/lapack/explore-html-3.6.1/d7/d15/group__double__blas__level2_gadd421a107a488d524859b4a64c1901a9.html"><code>DGEMV()</code></a>.</p>
+</section>
+<section id="building-lapack" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="building-lapack">Building LAPACK</h2>
+<p><a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms">LAPACK</a> (Linear Algebra Package) is a software library for solving linear algebra problems numerically. It’s built upon BLAS and has similarly become a standard with many reimplementations designed for specific hardware or systems.</p>
+<p>Let’s finish this post by also building the “reference implementation” of LAPACK<a href="#fn32" class="footnote-ref" id="fnref32" role="doc-noteref"><sup>32</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><p><sup>32</sup>&nbsp;Also available from <a href="https://www.netlib.org/lapack/">netlib</a>, released under a modified BSD licence.</p></div><div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>curl -L https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz &gt; lapack-3.12.0.tgz</div>
+<div class="line out" style="white-space: pre;">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div>
+<div class="line out" style="white-space: pre;">                                 Dload  Upload   Total   Spent    Left  Speed</div>
+<div class="line out" style="white-space: pre;">100 7747k    0 7747k    0     0  4117k      0 --:--:--  0:00:01 --:--:-- 6655k</div>
+<div class="line"><span class="prompt">[~/fortran]</span>tar xzf lapack-3.12.0.tgz</div>
+</div>
+<p>Similar to BLAS, we need to modify some configuration options to let LAPACK know about Emscripten and <code>flang-new</code>. Copy the file <code>lapack-3.12.0/make.inc.example</code> to <code>lapack-3.12.0/make.inc</code>, then make the following modifications. Be sure to replace <code>[...]</code> with the full path to the build directory on your machine<a href="#fn33" class="footnote-ref" id="fnref33" role="doc-noteref"><sup>33</sup></a>, and leave the other options in the file as they are.</p>
+<div class="no-row-height column-margin column-container"><p><sup>33</sup>&nbsp;A relative path doesn’t work here. Alternatively, simply set the option to read <code>flang-new</code> and make it available on your <code>$PATH</code>.</p></div><div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>lapack-3.12.0/make.inc</strong></pre>
+</div>
+<div class="sourceCode" id="cb14" data-filename="lapack-3.12.0/make.inc"><pre class="sourceCode makefile code-with-copy"><code class="sourceCode makefile"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">FC</span> <span class="ch">=</span><span class="st"> [...]/build/bin/flang-new</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">FFLAGS</span> <span class="ch">=</span><span class="st"> -O2</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="dt">FFLAGS_DRV</span> <span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">FFLAGS</span><span class="ch">)</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="dt">FFLAGS_NOOPT</span> <span class="ch">=</span><span class="st"> -O0</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="dt">AR</span> <span class="ch">=</span><span class="st"> emar</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="dt">RANLIB</span> <span class="ch">=</span><span class="st"> emranlib</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="dt">TIMER</span> <span class="ch">=</span><span class="st"> INT_CPU_TIME</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, build LAPACK using the <code>make lib</code> command to create the WebAssembly static library <code>liblapack.a</code>.</p>
+<div class="console">
+<div class="line"><span class="prompt">[~/fortran]</span>cd lapack-3.12.0</div>
+<div class="line"><span class="prompt">[~/fortran/lapack-3.12.0]</span>make lib</div>
+<div class="line out">make -C SRC</div>
+<div class="line out">.../build/bin/flang-new -O2  -c -o sbdsvdx.o sbdsvdx.f</div>
+<div class="line out">...</div>
+<div class="line out">emar cr ../../libtmglib.a slatms.o ... dlarnd.o</div>
+<div class="line out">emranlib ../../libtmglib.a</div>
+<div class="line"><span class="prompt">[~/fortran/lapack-3.12.0]</span>cd ..</div>
+<div class="line"><span class="prompt">[~/fortran]</span></div>
+<div class="line"><span class="prompt">[~/fortran]</span>file lapack-3.12.0/liblapack.a</div>
+<div class="line out">lapack-3.12.0/liblapack.a: current ar archive</div>
+</div>
+<p>With this, LAPACK routines can be called in a similar way to the BLAS routine example in the previous section.</p>
+</section>
+<section id="example-polynomial-interpolation-with-linear-algebra" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="example-polynomial-interpolation-with-linear-algebra">Example: Polynomial Interpolation with Linear Algebra</h2>
+<p>The following demo finds interpolating polynomials for a set of points, demonstrating LAPACK routines running in your web browser.</p>
+<p>Click the plot to add new points. An interpolating polynomial will be found to pass through all the points using <a href="https://en.wikipedia.org/wiki/Vandermonde_matrix">Vandermonde’s method</a><a href="#fn34" class="footnote-ref" id="fnref34" role="doc-noteref"><sup>34</sup></a>. The linear algebra equation given by this method is then solved numerically in LAPACK using the <a href="https://netlib.org/lapack/explore-html-3.6.1/d7/d3b/group__double_g_esolve_ga1df516c81d3e902cca1fc79a7220b9cb.html#ga1df516c81d3e902cca1fc79a7220b9cb"><code>DGELS()</code></a> routine.</p>
+<div class="no-row-height column-margin column-container"><p><sup>34</sup>&nbsp; It is always possible to find an <span class="math inline">\(n-1\)</span> degree polynomial containing <span class="math inline">\(n\)</span> data points exactly. However, when <span class="math inline">\(n\)</span> is large the polynomial fluctuates wildly between successive data points. This problem is known as <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge’s phenomenon</a> and can be avoided by using <a href="https://en.wikipedia.org/wiki/Spline_interpolation">spline interpolation</a>.</p></div><div id="poly">
+<iframe src="https://georgestagg.github.io/interpolating-polynomials-wasm/"></iframe>
+</div>
+</section>
+</section>
+<section id="final-thoughts" class="level1">
+<h1>Final thoughts</h1>
+<p>If you followed along at home, you now have a version of LLVM Flang that can compile modern Fortran code into WebAsembly objects. As I mentioned earlier, while it’s always been possible to build numerical algorithms for the web using JavaScript, to me the beauty of this approach is it allows you to use powerful Fortran tools and libraries that already exist, avoiding time and effort rewriting large collections of numerical routines for the web.</p>
+<p>It would be wonderful if WebAssembly could be officially supported by the <code>flang-new</code> compiler. It would certainly lessen the burden of maintaining a fork of LLVM for <a href="https://github.com/r-wasm/webr">webR</a> and its R packages. However, without some help and support from a more experienced compiler developer, we will need to continue using a patched version for now.</p>
+<p>If you’re familiar with LLVM Flang and know a better route to fixing the issues described above in a way that works for all targets with cross-compilation, feel free to <a href="mailto:george@stagg.phd">email me</a>. I’d be very interested to hear.</p>
+<p>If you’d like to experiment with compiling Fortran code for WebAssembly but can’t or don’t want to build LLVM Flang from scratch, we provide a Docker container with <a href="https://github.com/r-wasm/flang-wasm/pkgs/container/flang-wasm">a binary version of our patched LLVM Flang</a> in the GitHub container registry.</p>
+
+
+</section>
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
