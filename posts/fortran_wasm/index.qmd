@@ -1,6 +1,6 @@
 ---
 title: "Fortran on WebAssembly"
-description: "Patching LLVM's `flang-new` compiler to output WebAssembly objects."
+description: "Patching LLVM Flang to output WebAssembly objects."
 author: "George Stagg"
 date: "2024/03/12"
 image: "thumb.jpg"
