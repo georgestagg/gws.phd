@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/webr_0.3.1/index.html",
       "/posts/fortran_wasm/index.html",
       "/posts/webr_0.2.0/index.html",
       "/posts/webr_released/index.html",
