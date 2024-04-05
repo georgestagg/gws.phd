@@ -57,7 +57,7 @@ The [`f2c`](https://en.wikipedia.org/wiki/F2c) program converts <span style="fon
 
 ### LFortran
 
-The LFortran compiler has made great strides over the last few years. In 2020, it was [missing basic features](https://gitlab.com/lfortran/lfortran/-/issues/121) such as loops, conditionals, and variable assignment. It now supports a much wider range of language features and can be used to compile a reasonable amount of Fortran code. It can even compile to WebAssembly out of the box!^[Check out the LFortran demo at <https://dev.lfortran.org>. While extremely impressive, note that the first thing I tried was changing `x ** 2` to `x ** 3` and saw that such a change is currently not supported by the code generator.]
+The LFortran compiler has made great strides over the last few years. In 2020, it was [missing a lot of features](https://gitlab.com/lfortran/lfortran/-/issues/121) and only supported a very small subset of Fortran. Now it now supports a much wider range of language features and can be used to compile a reasonable amount of Fortran code. It can even compile to WebAssembly out of the box!^[Check out the LFortran demo at <https://dev.lfortran.org>. While extremely impressive, note that the first thing I tried was changing `x ** 2` to `x ** 3` and saw that such a change is currently not supported by the code generator.]
 
 However, there are still some barriers that make using LFortran a little rough. The project is currently considered to be in alpha phase and the developers state that issues compiling real-world code are expected. While it can successfully compile some projects, such as [MINPACK](https://github.com/fortran-lang/minpack), the full Fortran specification is not yet supported and so many larger projects still cannot be compiled.
 
