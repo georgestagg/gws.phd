@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2024-03-12">
 <meta name="description" content="Patching LLVM Flang to output WebAssembly objects.">
 
-<title>Dr George W Stagg - Fortran on WebAssembly</title>
+<title>Fortran on WebAssembly – Dr George W Stagg</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -107,7 +107,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -140,11 +140,11 @@ window.Quarto = {
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="terminal.css">
 <link rel="stylesheet" href="iframe.css">
-<meta property="og:title" content="Dr George W Stagg - Fortran on WebAssembly">
+<meta property="og:title" content="Fortran on WebAssembly – Dr George W Stagg">
 <meta property="og:description" content="Patching LLVM Flang to output WebAssembly objects.">
 <meta property="og:image" content="https://gws.phd/posts/fortran_wasm/thumb.jpg">
 <meta property="og:site_name" content="Dr George W Stagg">
-<meta name="twitter:title" content="Dr George W Stagg - Fortran on WebAssembly">
+<meta name="twitter:title" content="Fortran on WebAssembly – Dr George W Stagg">
 <meta name="twitter:description" content="Patching LLVM Flang to output WebAssembly objects.">
 <meta name="twitter:image" content="https://gws.phd/posts/fortran_wasm/thumb.jpg">
 <meta name="twitter:creator" content="@gwstagg">
@@ -159,7 +159,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -194,7 +194,7 @@ window.Quarto = {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
@@ -204,7 +204,7 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
@@ -270,17 +270,17 @@ window.Quarto = {
 <section id="introduction" class="level1 page-columns page-full">
 <h1>Introduction</h1>
 <p><span class="smallcaps"><a href="https://fortran-lang.org">Fortran</a></span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is one of the oldest programming languages around. It first appeared in 1957, making it older than the C programming language, the Intel 4004 CPU, and even the IBM System/360 series of mainframe computers<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. Fortran was created at a time when the byte had just been invented, and computers were still made of vacuum tubes and frustration.</p>
-<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;The name is derived from <em>Formula Translator</em>. <span class="smallcaps">Fortran</span> was originally stylised in all-caps, but modern Fortran has dropped it.</p><p><sup>2</sup>&nbsp;The System/360 was released around 1965. The 4004 around 1970. And <a href="https://en.wikipedia.org/wiki/The_C_Programming_Language">K&amp;R C</a> was published in 1978.</p><p><sup>3</sup>&nbsp;The argument goes that Fortran’s lack of aliasing and use of native arrays rather than pointer arithmetic allow the optimiser to generate more efficient output than an equivalent C program. However, there are also counter-arguments against this.</p></div><p>Over the years, Fortran has formed a rich history of use for computationally intensive scientific and engineering applications. It has powered the fluid dynamics of weather prediction and climate models, provided the condensed matter simulations for my <a href="../../docs/thesis_gws.pdf">PhD</a>, and is still considered by some to be more efficient than C for numerically heavy work<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. The syntax of modern Fortran is also surprisingly easy to get up and running with. This is not your parent’s <span class="smallcaps">Fortran&nbsp;77</span> code; most restrictions that make fixed‑form Fortran awful to use are no longer in place in modern Fortran.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;The name is derived from <em>Formula Translator</em>. <span class="smallcaps">Fortran</span> was originally stylised in all-caps, but modern Fortran has dropped it.</p></div><div id="fn2"><p><sup>2</sup>&nbsp;The System/360 was released around 1965. The 4004 around 1970. And <a href="https://en.wikipedia.org/wiki/The_C_Programming_Language">K&amp;R C</a> was published in 1978.</p></div><div id="fn3"><p><sup>3</sup>&nbsp;The argument goes that Fortran’s lack of aliasing and use of native arrays rather than pointer arithmetic allow the optimiser to generate more efficient output than an equivalent C program. However, there are also counter-arguments against this.</p></div></div><p>Over the years, Fortran has formed a rich history of use for computationally intensive scientific and engineering applications. It has powered the fluid dynamics of weather prediction and climate models, provided the condensed matter simulations for my <a href="../../docs/thesis_gws.pdf">PhD</a>, and is still considered by some to be more efficient than C for numerically heavy work<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. The syntax of modern Fortran is also surprisingly easy to get up and running with. This is not your parent’s <span class="smallcaps">Fortran&nbsp;77</span> code; most restrictions that make fixed‑form Fortran awful to use are no longer in place in modern Fortran.</p>
 <p>In a clash of computational eras, this blog post is about compiling existing Fortran code for WebAssembly so that it can run in a web browser. I’ll describe the method we currently use for the <a href="https://github.com/r-wasm/webr">webR</a> project, compiling Fortran code using a patched version of <a href="https://llvm.org">LLVM</a>’s <code>flang-new</code> compiler<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. The post also serves as a request for help. The method I describe unfortunately relies on a hack, and this hack means that I cannot contribute the changes back to LLVM without assistance from a more experienced compiler developer.</p>
-<div class="no-row-height column-margin column-container"><p><sup>4</sup>&nbsp;“LLVM” is not an acronym, it is the full name of the project.</p></div></section>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;“LLVM” is not an acronym, it is the full name of the project.</p></div></div></section>
 <section id="so-whats-the-problem" class="level1 page-columns page-full">
 <h1>So, what’s the problem?</h1>
 <p>There are a surprising number of potential methods and toolchains available to compile Fortran to WebAssembly. Unfortunately, none of the available options are feature complete. Each method has its drawbacks, and none are a simple plug-and-play solution.</p>
 <p>Back in 2020, the situation was summarised wonderfully by Christoph Honal’s article <a href="https://chrz.de/2020/04/21/fortran-in-the-browser/">FORTRAN in the Browser</a>. Even now, the article is worth reading and provides a nice background for this post. I personally owe a lot to Christoph’s article, particularly for its description of the <a href="https://dragonegg.llvm.org">Dragonegg</a> toolchain. Without that article, I would have given up on Fortran for WebAssembly a long time ago.</p>
 <p>Our goal by the end of this post is to be able to compile a modern Fortran routine to WebAssembly that takes in some numerical arguments, computes the output of <a href="http://www.netlib.org/blas/">BLAS</a> and <a href="https://netlib.org/lapack/">LAPACK</a> routines<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>, and either returns the result or prints it to console. From what I remember, in 2020 none of the methods outlined in Christoph’s article could do this satisfactorily. Dragonegg and <code>f2c</code> both get close but have some drawbacks, as I’ll describe below.</p>
-<div class="no-row-height column-margin column-container"><p><sup>5</sup>&nbsp;LAPACK (Linear Algebra Package) is a popular library of routines used to numerically solve problems in linear algebra. It’s written in Fortran 90 and itself relies on a BLAS (Basic Linear Algebra Subprograms) library.</p><p><sup>6</sup>&nbsp;via <a href="https://pyodide.org/en/stable/">Pyodide</a> and <a href="https://github.com/r-wasm/webr">webR</a>.</p></div><p>Together, BLAS and LAPACK routines provide a powerful numerical platform. Running them in the browser opens the door for several higher-level programming environments that rely on them under the hood, such as SciPy or R<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. The beauty of this approach is that it allows you to bring existing and extensively battle-tested tools and libraries to the web without having to rewrite them all in Rust or JavaScript.</p>
+<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;LAPACK (Linear Algebra Package) is a popular library of routines used to numerically solve problems in linear algebra. It’s written in Fortran 90 and itself relies on a BLAS (Basic Linear Algebra Subprograms) library.</p></div><div id="fn6"><p><sup>6</sup>&nbsp;via <a href="https://pyodide.org/en/stable/">Pyodide</a> and <a href="https://github.com/r-wasm/webr">webR</a>.</p></div></div><p>Together, BLAS and LAPACK routines provide a powerful numerical platform. Running them in the browser opens the door for several higher-level programming environments that rely on them under the hood, such as SciPy or R<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. The beauty of this approach is that it allows you to bring existing and extensively battle-tested tools and libraries to the web without having to rewrite them all in Rust or JavaScript.</p>
 <p>Later, I’ll show an example of this with a machine learning demo that directly uses BLAS routines compiled from Fortran to WebAssembly. Rather than having to write fiddly linear algebra numerical algorithms in JavaScript, we can use reliable and efficient BLAS routines directly<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>7</sup>&nbsp;Whilst running machine learning algorithms in a web browser will never be as efficient as using dedicated hardware, such as a GPU, I still think it’s a fun demo.</p></div><section id="compiler-round-up" class="level2 page-columns page-full">
+<div class="no-row-height column-margin column-container"><div id="fn7"><p><sup>7</sup>&nbsp;Whilst running machine learning algorithms in a web browser will never be as efficient as using dedicated hardware, such as a GPU, I still think it’s a fun demo.</p></div></div><section id="compiler-round-up" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="compiler-round-up">Compiler round-up</h2>
 <p>Since <a href="https://chrz.de/2020/04/21/fortran-in-the-browser/">FORTRAN in the Browser</a> was published things have changed a little, particularly when it comes to the LLVM-based Fortran compilers. As far as I am aware, here’s a brief round-up of the current situation in 2024.</p>
 <section id="the-f2c-utility" class="level3">
@@ -290,19 +290,19 @@ window.Quarto = {
 <section id="lfortran" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="lfortran">LFortran</h3>
 <p>The LFortran compiler has made great strides over the last few years. In 2020, it was <a href="https://gitlab.com/lfortran/lfortran/-/issues/121">missing a lot of features</a> and only supported a very small subset of Fortran. Now it now supports a much wider range of language features and can be used to compile a reasonable amount of Fortran code. It can even compile to WebAssembly out of the box!<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>8</sup>&nbsp;Check out the LFortran demo at <a href="https://dev.lfortran.org" class="uri">https://dev.lfortran.org</a>. While extremely impressive, note that the first thing I tried was changing <code>x ** 2</code> to <code>x ** 3</code> and saw that such a change is currently not supported by the code generator.</p></div><p>However, there are still some barriers that make using LFortran a little rough. The project is currently considered to be in alpha phase and the developers state that issues compiling real-world code are expected. While it can successfully compile some projects, such as <a href="https://github.com/fortran-lang/minpack">MINPACK</a>, the full Fortran specification is not yet supported and so many larger projects still cannot be compiled.</p>
+<div class="no-row-height column-margin column-container"><div id="fn8"><p><sup>8</sup>&nbsp;Check out the LFortran demo at <a href="https://dev.lfortran.org" class="uri">https://dev.lfortran.org</a>. While extremely impressive, note that the first thing I tried was changing <code>x ** 2</code> to <code>x ** 3</code> and saw that such a change is currently not supported by the code generator.</p></div></div><p>However, there are still some barriers that make using LFortran a little rough. The project is currently considered to be in alpha phase and the developers state that issues compiling real-world code are expected. While it can successfully compile some projects, such as <a href="https://github.com/fortran-lang/minpack">MINPACK</a>, the full Fortran specification is not yet supported and so many larger projects still cannot be compiled.</p>
 <p>The LFortran developers are targeting full support for Fortran 2018, and its standout feature is an interactive Jupyter-like Fortran REPL. With a few more years of development, I expect that LFortran will be an excellent choice for compiling Fortran code for WebAssembly.</p>
 </section>
 <section id="dragonegg" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="dragonegg">Dragonegg</h3>
 <p><a href="https://dragonegg.llvm.org">Dragonegg</a> is a plugin for GCC that uses the GNU compilers as a frontend and emits LLVM IR. With this, LLVM can be used as the backend to produce WebAssembly output. The technique works, and it was the original method that I used to compile Fortran sources for the <a href="https://github.com/r-wasm/webr">webR</a> project.</p>
 <p>However, there are some pretty serious drawbacks to this approach. Dragonegg requires a very old version of GCC and LLVM<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>. For most users, this means setting up a virtual machine or Docker container to provide the necessary environment. The LLVM IR emitted by Dragonegg also needs some fairly nasty post-processing before LLVM can produce WebAssembly output. Take a look at the <a href="https://github.com/r-wasm/webr/blob/v0.1.0/tools/dragonegg/emfc.in">script originally used by webR</a> to get an idea of the extra processing required.</p>
-<div class="no-row-height column-margin column-container"><p><sup>9</sup>&nbsp;The latest supported versions are <code>gcc-4.8</code> and <code>llvm-3.3</code></p></div><p>Nevertheless, in 2020 this was the only real way to compile Fortran code for WebAssembly.</p>
+<div class="no-row-height column-margin column-container"><div id="fn9"><p><sup>9</sup>&nbsp;The latest supported versions are <code>gcc-4.8</code> and <code>llvm-3.3</code></p></div></div><p>Nevertheless, in 2020 this was the only real way to compile Fortran code for WebAssembly.</p>
 </section>
 <section id="classic-flang" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="classic-flang">Classic flang</h3>
 <p><a href="https://github.com/flang-compiler/flang">“Classic” Flang</a><a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a> is another Fortran compiler targeting LLVM, based on an open-sourced PGI/NVIDIA compiler <code>pgfortran</code>. Classic Flang never supported 32-bit output, so it is not an option for us since we’ll be using <code>wasm32</code> for our target architecture. This will likely be the case until browser support for 64-bit Wasm memory has improved<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>10</sup>&nbsp;Previously, Flang or Flang-7.</p><p><sup>11</sup>&nbsp;At the time of writing Firefox, Chrome and Node supports <code>wasm64</code>, but locked behind a feature flag.</p></div><p>Even so, the project documentation itself suggests that choosing to use Classic Flang for a new project today is probably not a great idea:</p>
+<div class="no-row-height column-margin column-container"><div id="fn10"><p><sup>10</sup>&nbsp;Previously, Flang or Flang-7.</p></div><div id="fn11"><p><sup>11</sup>&nbsp;At the time of writing Firefox, Chrome and Node supports <code>wasm64</code>, but locked behind a feature flag.</p></div></div><p>Even so, the project documentation itself suggests that choosing to use Classic Flang for a new project today is probably not a great idea:</p>
 <blockquote class="blockquote">
 <p>Classic Flang […] continues to be maintained, but the plan is to replace Classic Flang with the new Flang in the future.</p>
 </blockquote>
@@ -310,7 +310,7 @@ window.Quarto = {
 <section id="llvm-flang" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="llvm-flang">LLVM Flang</h3>
 <p><a href="https://flang.llvm.org/docs/">“LLVM Flang”</a><a href="#fn12" class="footnote-ref" id="fnref12" role="doc-noteref"><sup>12</sup></a> is a full ground-up reimplementation of a Fortran frontend for LLVM. It was designed to replace Classic Flang, developed by much of the same team, and was accepted as part of the LLVM project as of LLVM 11. As such, the Flang sources can now be found in <a href="https://github.com/llvm/llvm-project/tree/main/flang">the official LLVM source tree</a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>12</sup>&nbsp;Also known as Flang, new Flang, or <code>flang-new</code>. Previously, F18.</p></div><p>Flang is not yet considered to be ready for production use, but its development is extremely active right now and pre-production versions of the <code>flang-new</code> compiler have been made available by the team. In recent years, the compiler has become very usable for compiling real-world Fortran code.</p>
+<div class="no-row-height column-margin column-container"><div id="fn12"><p><sup>12</sup>&nbsp;Also known as Flang, new Flang, or <code>flang-new</code>. Previously, F18.</p></div></div><p>Flang is not yet considered to be ready for production use, but its development is extremely active right now and pre-production versions of the <code>flang-new</code> compiler have been made available by the team. In recent years, the compiler has become very usable for compiling real-world Fortran code.</p>
 <p>Currently, LLVM Flang cannot generate WebAssembly output out of the box. Despite this, we’ll soon see that with LLVM’s modular design it’s possible to use the Flang frontend with LLVM’s WebAssembly backend. With this, we can take advantage of all the development work put into the Flang frontend by the NVIDIA and PGI teams for our own purposes of compiling Fortran to WebAssembly.</p>
 <p>This was also possible back in 2020, though it required larger patches to LLVM, injecting custom maths routines, and a multi-step compilation process. Now, due to the impressive development efforts in the <code>flang-new</code> frontend, creating a Fortran to WebAssembly compiler is possible with just a few small changes to LLVM’s source code.</p>
 </section>
@@ -319,7 +319,7 @@ window.Quarto = {
 <section id="building-and-using-llvm-flang-for-webassembly" class="level1 page-columns page-full">
 <h1>Building and using LLVM Flang for WebAssembly</h1>
 <p>If one were interested in trying out LLVM Flang, they might grab an LLVM release using their package manager of choice. However, following that route will disappoint us, as a <code>flang-new</code> binary is not included<a href="#fn13" class="footnote-ref" id="fnref13" role="doc-noteref"><sup>13</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>13</sup>&nbsp;At least, not with LLVM v17.0.6 for macOS using <code>brew</code>.</p></div><div class="console">
+<div class="no-row-height column-margin column-container"><div id="fn13"><p><sup>13</sup>&nbsp;At least, not with LLVM v17.0.6 for macOS using <code>brew</code>.</p></div></div><div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>brew install llvm</div>
 <div class="line out"><span class="blue">==&gt;</span> Downloading https://formulae.brew.sh/api/formula.jws.json</div>
 <div class="line out">################################################################################ 100.0%</div>
@@ -338,7 +338,7 @@ window.Quarto = {
 <div class="line out">zsh: command not found: flang-new</div>
 </div>
 <p>Since we will be modifying the LLVM Flang source in any case, we’ll have to compile from scratch. Let’s grab the LLVM v18.1.1 sources and start there instead. Feel free to follow along at home; I’ll try to provide all the commands and everything you need.<a href="#fn14" class="footnote-ref" id="fnref14" role="doc-noteref"><sup>14</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>14</sup>&nbsp;I’m going to assume you’re familiar with <a href="https://emscripten.org">Emscripten</a> and have a version of that toolchain on your path. If not, and you want to play along, start with <a href="https://github.com/emscripten-core/emsdk">emsdk</a> to setup Emscripten on your machine, get comfortable with compiling C code for WebAssembly, then return here to continue.</p></div><div class="console">
+<div class="no-row-height column-margin column-container"><div id="fn14"><p><sup>14</sup>&nbsp;I’m going to assume you’re familiar with <a href="https://emscripten.org">Emscripten</a> and have a version of that toolchain on your path. If not, and you want to play along, start with <a href="https://github.com/emscripten-core/emsdk">emsdk</a> to setup Emscripten on your machine, get comfortable with compiling C code for WebAssembly, then return here to continue.</p></div></div><div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>git clone --depth=1 --branch=llvmorg-18.1.1 https://github.com/llvm/llvm-project.git</div>
 <div class="line out">Cloning into 'llvm-project'...</div>
 <div class="line out">remote: Enumerating objects: 138937, done.</div>
@@ -363,7 +363,7 @@ window.Quarto = {
 <div class="line out">[6136/6136] Linking CXX executable bin/obj2yaml</div>
 </div>
 <p>Grab a cuppa<a href="#fn15" class="footnote-ref" id="fnref15" role="doc-noteref"><sup>15</sup></a>, this step uses a lot of resources and can take a <strong>very</strong> long time.</p>
-<div class="no-row-height column-margin column-container"><p><sup>15</sup>&nbsp;<strong>cuppa</strong> (/ˈkʌp.ə/): noun, informal, UK. A hot drink, usually tea or coffee.</p></div><section id="interlude-calling-fortran-subroutines-from-c" class="level2 page-columns page-full">
+<div class="no-row-height column-margin column-container"><div id="fn15"><p><sup>15</sup>&nbsp;<strong>cuppa</strong> (/ˈkʌp.ə/): noun, informal, UK. A hot drink, usually tea or coffee.</p></div></div><section id="interlude-calling-fortran-subroutines-from-c" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="interlude-calling-fortran-subroutines-from-c">Interlude — Calling Fortran subroutines from C</h2>
 <p>While we wait for LLVM to build, start up a new terminal and we’ll remind ourselves how to compile and link a Fortran subroutine as part of a C program. The principles here will help us later when it comes to calling Fortran from JavaScript.</p>
 <p>First, let’s write a simple subroutine that takes in three integer arguments: <code>x</code>, <code>y</code>, and <code>z</code>. It will set the value of <code>z</code> to the sum of <code>x</code> and <code>y</code>. Name our new subroutine <code>foo</code> and save the file containing your subroutine as <code>foo.f08</code>.</p>
@@ -379,7 +379,7 @@ window.Quarto = {
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">END</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Notice how, generally, Fortran routines pass arguments by reference and we can declare how an argument will be used in the subroutine using <code>INTENT()</code>. Assuming you already have a traditional Fortran compiler like <code>gfortran</code> installed<a href="#fn16" class="footnote-ref" id="fnref16" role="doc-noteref"><sup>16</sup></a>, compile the Fortran source into an object file.</p>
-<div class="no-row-height column-margin column-container"><p><sup>16</sup>&nbsp;You don’t <em>need</em> a native fortran compiler to follow along with the rest of the post, but if you’d like one you can get <code>gfortran</code> from your OS’s usual package manager as part of the GCC compiler suite. There’s also <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/fortran-compiler.html"><code>ifort</code></a>, if you’re on an Intel CPU.</p></div><div class="console">
+<div class="no-row-height column-margin column-container"><div id="fn16"><p><sup>16</sup>&nbsp;You don’t <em>need</em> a native fortran compiler to follow along with the rest of the post, but if you’d like one you can get <code>gfortran</code> from your OS’s usual package manager as part of the GCC compiler suite. There’s also <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/fortran-compiler.html"><code>ifort</code></a>, if you’re on an Intel CPU.</p></div></div><div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>gfortran -c foo.f08 -o foo.o</div>
 <div class="line"><span class="prompt">[~/fortran]</span>file foo.o</div>
 <div class="line out">foo.o: Mach-O 64-bit object arm64</div>
@@ -391,7 +391,7 @@ window.Quarto = {
 </div>
 <p>I’m on an M1 macOS machine, so my resulting object is a Mach object for ARM. If you’re a Linux user, you should see something like <code>ELF 64-bit LSB shared object, x86-64</code>. I’ve also run <code>nm</code> to take a look at the names of the symbols in the object that the compiler has built. Keep an eye on the symbol for our subroutine — on my machine it’s named <code>_foo_</code>. The leading underscore is fairly standard, but the trailing underscore differs from what is usual for C procedures.</p>
 <p>Let’s write a C program that calls our Fortran subroutine<a href="#fn17" class="footnote-ref" id="fnref17" role="doc-noteref"><sup>17</sup></a>. Notice again how we pass the arguments by reference to the external symbol. Also, if your Fortran compiler added the trailing underscore, we’ll need to include it when we declare the symbol name in C.</p>
-<div class="no-row-height column-margin column-container"><p><sup>17</sup>&nbsp;Modern Fortran standards provide a Fortran module <a href="https://fortranwiki.org/fortran/show/iso_c_binding"><code>iso_c_binding</code></a> and a C header file <code>ISO_Fortran_binding.h</code> to improve C interoperability, but our code is going to be simple enough that we can do without those today.</p></div><div class="code-with-filename">
+<div class="no-row-height column-margin column-container"><div id="fn17"><p><sup>17</sup>&nbsp;Modern Fortran standards provide a Fortran module <a href="https://fortranwiki.org/fortran/show/iso_c_binding"><code>iso_c_binding</code></a> and a C header file <code>ISO_Fortran_binding.h</code> to improve C interoperability, but our code is going to be simple enough that we can do without those today.</p></div></div><div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>main.c</strong></pre>
 </div>
@@ -508,7 +508,7 @@ window.Quarto = {
 <div class="line out">00000001 T foo_</div>
 </div>
 <p>Success! We can confirm this is a real WebAssembly object using the <code>file</code> utility, and <code>llvm-nm</code><a href="#fn18" class="footnote-ref" id="fnref18" role="doc-noteref"><sup>18</sup></a> can see the <code>foo</code> symbol within, corresponding to our Fortran subroutine.</p>
-<div class="no-row-height column-margin column-container"><p><sup>18</sup>&nbsp;You might need to use a WebAssembly aware version of this tool from Emscripten. If you’re using <a href="https://github.com/emscripten-core/emsdk">emsdk</a>, ensure that <code>.../emsdk/upstream/bin/</code> is on your <code>$PATH</code>.</p><p><sup>19</sup>&nbsp;Here I’m using Node v18, but I think anything newer than Node v16 should work. Emscripten is bundled with a version of Node, but I like using <a href="https://github.com/nvm-sh/nvm">nvm</a> to manage my Node installations.</p></div><p>Let’s continue compiling our C function for WebAssembly using Emscripten and running it using Node<a href="#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a>. We should see the same output as with our native binary.</p>
+<div class="no-row-height column-margin column-container"><div id="fn18"><p><sup>18</sup>&nbsp;You might need to use a WebAssembly aware version of this tool from Emscripten. If you’re using <a href="https://github.com/emscripten-core/emsdk">emsdk</a>, ensure that <code>.../emsdk/upstream/bin/</code> is on your <code>$PATH</code>.</p></div><div id="fn19"><p><sup>19</sup>&nbsp;Here I’m using Node v18, but I think anything newer than Node v16 should work. Emscripten is bundled with a version of Node, but I like using <a href="https://github.com/nvm-sh/nvm">nvm</a> to manage my Node installations.</p></div></div><p>Let’s continue compiling our C function for WebAssembly using Emscripten and running it using Node<a href="#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a>. We should see the same output as with our native binary.</p>
 <div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>emcc main.c foo.o -o main.js</div>
 <div class="line"><span class="prompt">[~/fortran]</span>node main.js</div>
@@ -519,7 +519,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="interlude-calling-a-fortran-routine-from-javascript">Interlude — Calling a Fortran routine from JavaScript</h2>
 <p>In the previous section we used a C program to call Fortran code, but we don’t technically need to do that. If we tell Emscripten about the Fortran subroutine, we can call it directly from JavaScript without writing any C code.</p>
 <p>First, let’s link our Fortran object with Emscripten, producing a script that loads our WebAssembly binary into memory but does not execute any routines. In addition to our symbol <code>_foo_</code>, we’ll also export <code>_malloc</code> and <code>_free</code> so that we can use them from JavaScript<a href="#fn20" class="footnote-ref" id="fnref20" role="doc-noteref"><sup>20</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>20</sup>&nbsp;See the <a href="https://emscripten.org/docs/tools_reference/settings_reference.html">Emscripten documentation</a> for more details about <code>emcc</code> command line options. By the way, if you’ve not used Emscripten much before you might see extra <code>cache:INFO</code> lines emitted during various steps in this post. They are nothing to worry about and can be ignored.</p></div><div class="console">
+<div class="no-row-height column-margin column-container"><div id="fn20"><p><sup>20</sup>&nbsp;See the <a href="https://emscripten.org/docs/tools_reference/settings_reference.html">Emscripten documentation</a> for more details about <code>emcc</code> command line options. By the way, if you’ve not used Emscripten much before you might see extra <code>cache:INFO</code> lines emitted during various steps in this post. They are nothing to worry about and can be ignored.</p></div></div><div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>emcc foo.o -sEXPORTED_FUNCTIONS=_foo_,_malloc,_free -o foo.js</div>
 <div class="line out">cache:INFO: generating system asset: symbol_lists/ae47d07bfa3321ac4dde96bd87821b4aa93f9a19.json... (this will be cached in ".../emsdk/upstream/emscripten/cache/symbol_lists/ae47d07bfa3321ac4dde96bd87821b4aa93f9a19.json" for subsequent builds)</div>
 <div class="line out">cache:INFO:  - ok</div>
@@ -528,7 +528,7 @@ window.Quarto = {
 </div>
 <p>Notice that when we run the script <code>foo.js</code> directly… nothing happens.</p>
 <p>Next, we’ll write a JavaScript file that loads <code>foo.js</code> and then calls our Fortran subroutine. We’ll need to allocate some memory to hold our integers <code>x</code>, <code>y</code> and <code>z</code> using the exported <code>_malloc()</code> function. We’ll also need to set our input arguments <code>x</code> and <code>y</code> to some integer values, and we can do that by setting values in the allocated WebAssembly memory through <code>Module.HEAPU32</code><a href="#fn21" class="footnote-ref" id="fnref21" role="doc-noteref"><sup>21</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>21</sup>&nbsp;Alternatively, see the <a href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#access-memory-from-javascript"><code>setValue()</code> and <code>getValue()</code> functions in the Emscripten API</a>.</p></div><div class="code-with-filename">
+<div class="no-row-height column-margin column-container"><div id="fn21"><p><sup>21</sup>&nbsp;Alternatively, see the <a href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#access-memory-from-javascript"><code>setValue()</code> and <code>getValue()</code> functions in the Emscripten API</a>.</p></div></div><div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>standalone.js</strong></pre>
 </div>
@@ -574,7 +574,7 @@ window.Quarto = {
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Spin up a local web server<a href="#fn22" class="footnote-ref" id="fnref22" role="doc-noteref"><sup>22</sup></a>, visit the page, and the same output should be seen in the browser’s JavaScript console.</p>
-<div class="no-row-height column-margin column-container"><p><sup>22</sup>&nbsp;Something like <code>Rscript -e 'httpuv::runStaticServer()'</code> or <code>python3 -m http.server</code> should work well.</p></div></section>
+<div class="no-row-height column-margin column-container"><div id="fn22"><p><sup>22</sup>&nbsp;Something like <code>Rscript -e 'httpuv::runStaticServer()'</code> or <code>python3 -m http.server</code> should work well.</p></div></div></section>
 <section id="the-fortran-runtime-library-a-journey-to-hello-world" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-fortran-runtime-library-a-journey-to-hello-world">The Fortran runtime library: A journey to “Hello, World!”</h2>
 <p>The ubiquitous “Hello, World!” test program is the usual way to introduce a programming language, but I didn’t introduce Fortran using such a program above. As you’ll see, that was for a good reason. Let’s see what happens when we try to build a “Hello, World!” subroutine in Fortran and call it from C. As before, we’ll compile the Fortran object using <code>flang-new</code> and use Emscripten to compile and link the C code.</p>
@@ -607,9 +607,9 @@ window.Quarto = {
 <div class="line out">emcc: error: 'wasm-ld -o hello.wasm [...] --no-entry --stack-first --table-base=1' failed (returned 1)</div>
 </div>
 <p>The build failed due to some missing symbols. This is a consequence of a more general issue in that we have not yet compiled the LLVM Fortran runtime library for WebAssembly. There are a bunch of library symbols that we’re currently missing, including some functions that are required to print output!<a href="#fn23" class="footnote-ref" id="fnref23" role="doc-noteref"><sup>23</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>23</sup>&nbsp;See <a href="https://flang.llvm.org/docs/IORuntimeInternals.html">LLVM Flang’s documentation</a> for the nuts and bolts of the Fortran IO runtime library implementation.</p></div><p>Luckily, the runtime library is written in C++ as part of the LLVM source tree at <code>llvm-project/flang/runtime</code>. So, in principle, all we need to do is build the library using Emscripten’s <code>em++</code> compiler and then link to it whenever we’re using Fortran code in our WebAssembly program.</p>
+<div class="no-row-height column-margin column-container"><div id="fn23"><p><sup>23</sup>&nbsp;See <a href="https://flang.llvm.org/docs/IORuntimeInternals.html">LLVM Flang’s documentation</a> for the nuts and bolts of the Fortran IO runtime library implementation.</p></div></div><p>Luckily, the runtime library is written in C++ as part of the LLVM source tree at <code>llvm-project/flang/runtime</code>. So, in principle, all we need to do is build the library using Emscripten’s <code>em++</code> compiler and then link to it whenever we’re using Fortran code in our WebAssembly program.</p>
 <p>Here is a <code>Makefile</code> designed to make this step easy. Save it<a href="#fn24" class="footnote-ref" id="fnref24" role="doc-noteref"><sup>24</sup></a> in the current directory and then run <code>make</code>. It should go ahead and use the version of Emscripten on your path to build a static Fortran runtime library at <code>build/flang/runtime/libFortranRuntime.a</code>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>24</sup>&nbsp;Be sure to indent the rules in this file using tabs, not spaces.</p></div><div class="code-with-filename">
+<div class="no-row-height column-margin column-container"><div id="fn24"><p><sup>24</sup>&nbsp;Be sure to indent the rules in this file using tabs, not spaces.</p></div></div><div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Makefile</strong></pre>
 </div>
@@ -660,7 +660,7 @@ window.Quarto = {
 <div class="line out">&gt;&gt;&gt; defined as (i32, i32, i32) -&gt; i32 in build/flang/runtime/libFortranRuntime.a(io-api.o)</div>
 </div>
 <p>Success? Not quite. A warning is issued, letting us know about a signature mismatch. Emscripten has compiled the symbol <code>_FortranAioOutputAscii</code> to take three <code>i32</code> arguments<a href="#fn25" class="footnote-ref" id="fnref25" role="doc-noteref"><sup>25</sup></a>. However, <code>flang-new</code> has compiled <code>hello.f08</code> with the expectation that the symbol takes two <code>i32</code> arguments and a single <code>i64</code> argument.</p>
-<div class="no-row-height column-margin column-container"><p><sup>25</sup>&nbsp;This is <a href="https://llvm.org/docs/LangRef.html#integer-type">LLVM IR notation</a>, meaning an integer of size 32 bits.</p><p><sup>26</sup>&nbsp;This continues to crop up when compiling R packages for webR. Package authors or vendored libraries may have used tools such as <code>f2c</code> that declare a Fortran <code>SUBROUTINE</code> to return an <code>int</code>, while other libraries might declare a Fortran <code>SUBROUTINE</code> to return <code>void</code>. Who is right? I’m not sure, as I understand it early Fortran did not have a standard interface to C. Personally, I think returning <code>void</code> makes most sense.</p></div><p>This is unfortunate. Despite being emitted as just a warning, if you try running the emitted program using Node you will see that the problem is catastrophic. WebAssembly, unlike a lot of target systems, absolutely requires that symbols defined over multiple compilation units have consistent function signatures, both in argument and return type<a href="#fn26" class="footnote-ref" id="fnref26" role="doc-noteref"><sup>26</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn25"><p><sup>25</sup>&nbsp;This is <a href="https://llvm.org/docs/LangRef.html#integer-type">LLVM IR notation</a>, meaning an integer of size 32 bits.</p></div><div id="fn26"><p><sup>26</sup>&nbsp;This continues to crop up when compiling R packages for webR. Package authors or vendored libraries may have used tools such as <code>f2c</code> that declare a Fortran <code>SUBROUTINE</code> to return an <code>int</code>, while other libraries might declare a Fortran <code>SUBROUTINE</code> to return <code>void</code>. Who is right? I’m not sure, as I understand it early Fortran did not have a standard interface to C. Personally, I think returning <code>void</code> makes most sense.</p></div></div><p>This is unfortunate. Despite being emitted as just a warning, if you try running the emitted program using Node you will see that the problem is catastrophic. WebAssembly, unlike a lot of target systems, absolutely requires that symbols defined over multiple compilation units have consistent function signatures, both in argument and return type<a href="#fn26" class="footnote-ref" id="fnref26" role="doc-noteref"><sup>26</sup></a>.</p>
 <div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>node hello.js</div>
 <div class="line out">.../fortran/hello.js:128</div>
@@ -693,7 +693,7 @@ window.Quarto = {
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">/// standard type `i32` when `sizeof(int)` is 4.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>And therein lies the problem. For us, the host is different to the target, breaking assumptions in the LLVM source code. Surprisingly, this does not cause as much chaos as you might expect. From what I can tell, this machinery is used only to make the Fortran runtime library functions, written in C++, available to Fortran. There is a compile-time calculation using <code>sizeof()</code>, and since most of the sizes match anyway<a href="#fn27" class="footnote-ref" id="fnref27" role="doc-noteref"><sup>27</sup></a> it mostly works fine.</p>
-<div class="no-row-height column-margin column-container"><p><sup>27</sup>&nbsp;The <a href="https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models">C data model</a> for the host and target defines how many bits certain fundamental C types are represented with. The specific sizes can differ based on the hardware architecture and your OS.</p></div><p>Unfortunately for us, assuming you’re following along on a modern 64-bit Unix-like system such as Linux or macOS, the sizes don’t match for the <code>long</code> data type. The result of <code>sizeof(long)</code> on our compiler’s host platform is 8 bytes (<code>i64</code>), but for the target platform of <code>wasm32-unknown-emscripten</code> the returned value should be 4 bytes (<code>i32</code>).</p>
+<div class="no-row-height column-margin column-container"><div id="fn27"><p><sup>27</sup>&nbsp;The <a href="https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models">C data model</a> for the host and target defines how many bits certain fundamental C types are represented with. The specific sizes can differ based on the hardware architecture and your OS.</p></div></div><p>Unfortunately for us, assuming you’re following along on a modern 64-bit Unix-like system such as Linux or macOS, the sizes don’t match for the <code>long</code> data type. The result of <code>sizeof(long)</code> on our compiler’s host platform is 8 bytes (<code>i64</code>), but for the target platform of <code>wasm32-unknown-emscripten</code> the returned value should be 4 bytes (<code>i32</code>).</p>
 <p>When we compile the Fortran runtime library C++ code using Emscripten, things are fine. The resulting symbols are compiled with signatures such that <code>long</code> arguments are <code>i32</code>. However, when we compile our Fortran code with <code>flang-new</code> the external library symbols are declared such that <code>long</code> arguments are <code>i64</code>. This difference leads to the inconsistent function signature warning and runtime failure.</p>
 <p>Why did using <code>PRINT()</code> in our “Hello, World!” program invoke a function that takes an argument of type <code>long</code>? Well, in some implementations of Fortran there are so-called “hidden” arguments that are added whenever you pass a Fortran <code>CHARACTER</code> type to a function or subroutine. These extra arguments pass in the length of the strings. In the Fortran runtime library the hidden arguments are declared with type <code>size_t</code> which, following a chain of <code>typedef</code>s, ends up being the same as <code>unsigned long</code>. This hidden implicit argument is the one with inconsistent size.</p>
 </section>
@@ -701,7 +701,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="hacking-around-the-issue">Hacking around the issue</h2>
 <p>Unfortunately, I don’t know enough about the LLVM or Flang internals to implement a real solution to this problem. Ideally, <code>flang-new</code> would emit the correct use of <code>i32</code> or <code>i64</code> for the target architecture and data model when cross-compiling, no matter the host architecture the compiler is running on.</p>
 <p>Since I can’t solve this today, let’s hack around it for now. We’ll build a version of <code>flang-new</code> with the size of a <code>long</code> hard-coded to what we need for <code>wasm32</code> and Emscripten. We’ll also make some changes so that calls to <code>malloc()</code> from Fortran are emitted with an <code>i32</code> argument<a href="#fn28" class="footnote-ref" id="fnref28" role="doc-noteref"><sup>28</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>28</sup>&nbsp;This additionally fixes dynamic allocation with <code>ALLOCATE()</code>, a feature introduced in Fortran 90.</p></div><p>The required patches are again shown as a diff below. If you’re following along, save it as a file named <code>force-4-byte-values.diff</code> and apply it to the <code>llvm-project</code> directory using <code>git</code> or the <code>patch</code> utility. Finally, recompile <code>flang-new</code> once more.</p>
+<div class="no-row-height column-margin column-container"><div id="fn28"><p><sup>28</sup>&nbsp;This additionally fixes dynamic allocation with <code>ALLOCATE()</code>, a feature introduced in Fortran 90.</p></div></div><p>The required patches are again shown as a diff below. If you’re following along, save it as a file named <code>force-4-byte-values.diff</code> and apply it to the <code>llvm-project</code> directory using <code>git</code> or the <code>patch</code> utility. Finally, recompile <code>flang-new</code> once more.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>force-4-byte-values.diff</strong></pre>
@@ -779,7 +779,7 @@ window.Quarto = {
 <section id="compiling-blas-and-lapack-for-webassembly" class="level1 page-columns page-full">
 <h1>Compiling BLAS and LAPACK for WebAssembly</h1>
 <p>Now that we have a Fortran compiler that can output WebAssembly objects, let’s build some Fortran projects. <a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms">BLAS</a> (Basic Linear Algebra Subprograms) is a set of low-level routines that perform many common operations in linear algebra, including tools for matrix and vector multiplication. They are a de facto standard in numerical computation, with several different implementations of the BLAS routines available. Some implementations have been tuned for use on certain hardware<a href="#fn29" class="footnote-ref" id="fnref29" role="doc-noteref"><sup>29</sup></a>, others have been well optimised on account of being around for a long time — the original BLAS routines were released in 1979!</p>
-<div class="no-row-height column-margin column-container"><p><sup>29</sup>&nbsp;See, for example, the <a href="https://www.intel.com/content/www/us/en/docs/onemkl/get-started-guide/2024-0/overview.html">Intel Math Kernel Library</a>.</p><p><sup>30</sup>&nbsp;Considered to be in the public domain. The actual <a href="https://www.netlib.org/blas/#_licensing">licence terms</a> are short and say that it is a “freely-available software package”.</p></div><p>Let’s grab a copy of the latest release of the so-called “reference implementation” of BLAS<a href="#fn30" class="footnote-ref" id="fnref30" role="doc-noteref"><sup>30</sup></a>, written in Fortran 90, and compile it using the patched LLVM we built above.</p>
+<div class="no-row-height column-margin column-container"><div id="fn29"><p><sup>29</sup>&nbsp;See, for example, the <a href="https://www.intel.com/content/www/us/en/docs/onemkl/get-started-guide/2024-0/overview.html">Intel Math Kernel Library</a>.</p></div><div id="fn30"><p><sup>30</sup>&nbsp;Considered to be in the public domain. The actual <a href="https://www.netlib.org/blas/#_licensing">licence terms</a> are short and say that it is a “freely-available software package”.</p></div></div><p>Let’s grab a copy of the latest release of the so-called “reference implementation” of BLAS<a href="#fn30" class="footnote-ref" id="fnref30" role="doc-noteref"><sup>30</sup></a>, written in Fortran 90, and compile it using the patched LLVM we built above.</p>
 <div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>curl -L https://www.netlib.org/blas/blas-3.12.0.tgz &gt; blas-3.12.0.tgz</div>
 <div class="line out" style="white-space: pre;">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div>
@@ -868,7 +868,7 @@ window.Quarto = {
 <div class="line out">Y[0]: 23.000000 + 6.000000i, Y[1]: 18.000000 + 10.000000i, Y[2]: 6.000000 + 16.000000i</div>
 </div>
 <p>And there we have it: BLAS compiled from Fortran 90 sources and running under WebAssembly! To finish up, let’s confirm for ourselves that this output is correct<a href="#fn31" class="footnote-ref" id="fnref31" role="doc-noteref"><sup>31</sup></a>,</p>
-<div class="no-row-height column-margin column-container"><p><sup>31</sup>&nbsp;Keeping in mind Fortran’s column-major array layout.</p></div><p><span class="math display">\[\begin{equation}
+<div class="no-row-height column-margin column-container"><div id="fn31"><p><sup>31</sup>&nbsp;Keeping in mind Fortran’s column-major array layout.</p></div></div><p><span class="math display">\[\begin{equation}
 \begin{split}
 \alpha\mathbf{A}\mathbf{x} &amp; + \beta\mathbf{y} \\[0.5em]
 &amp; =
@@ -904,7 +904,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="building-lapack">Building LAPACK</h2>
 <p><a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms">LAPACK</a> (Linear Algebra Package) is a software library for solving linear algebra problems numerically. It’s built upon BLAS and has similarly become a standard with many reimplementations designed for specific hardware or systems.</p>
 <p>Let’s finish this post by also building the “reference implementation” of LAPACK<a href="#fn32" class="footnote-ref" id="fnref32" role="doc-noteref"><sup>32</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>32</sup>&nbsp;Also available from <a href="https://www.netlib.org/lapack/">netlib</a>, released under a modified BSD licence.</p></div><div class="console">
+<div class="no-row-height column-margin column-container"><div id="fn32"><p><sup>32</sup>&nbsp;Also available from <a href="https://www.netlib.org/lapack/">netlib</a>, released under a modified BSD licence.</p></div></div><div class="console">
 <div class="line"><span class="prompt">[~/fortran]</span>curl -L https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz &gt; lapack-3.12.0.tgz</div>
 <div class="line out" style="white-space: pre;">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div>
 <div class="line out" style="white-space: pre;">                                 Dload  Upload   Total   Spent    Left  Speed</div>
@@ -912,7 +912,7 @@ window.Quarto = {
 <div class="line"><span class="prompt">[~/fortran]</span>tar xzf lapack-3.12.0.tgz</div>
 </div>
 <p>Similar to BLAS, we need to modify some configuration options to let LAPACK know about Emscripten and <code>flang-new</code>. Copy the file <code>lapack-3.12.0/make.inc.example</code> to <code>lapack-3.12.0/make.inc</code>, then make the following modifications. Be sure to replace <code>[...]</code> with the full path to the build directory on your machine<a href="#fn33" class="footnote-ref" id="fnref33" role="doc-noteref"><sup>33</sup></a>, and leave the other options in the file as they are.</p>
-<div class="no-row-height column-margin column-container"><p><sup>33</sup>&nbsp;A relative path doesn’t work here. Alternatively, simply set the option to read <code>flang-new</code> and make it available on your <code>$PATH</code>.</p></div><div class="code-with-filename">
+<div class="no-row-height column-margin column-container"><div id="fn33"><p><sup>33</sup>&nbsp;A relative path doesn’t work here. Alternatively, simply set the option to read <code>flang-new</code> and make it available on your <code>$PATH</code>.</p></div></div><div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>lapack-3.12.0/make.inc</strong></pre>
 </div>
@@ -946,7 +946,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="example-polynomial-interpolation-with-linear-algebra">Example: Polynomial Interpolation with Linear Algebra</h2>
 <p>The following demo finds interpolating polynomials for a set of points, demonstrating LAPACK routines running in your web browser.</p>
 <p>Click the plot to add new points. An interpolating polynomial will be found to pass through all the points using <a href="https://en.wikipedia.org/wiki/Vandermonde_matrix">Vandermonde’s method</a><a href="#fn34" class="footnote-ref" id="fnref34" role="doc-noteref"><sup>34</sup></a>. The linear algebra equation given by this method is then solved numerically in LAPACK using the <a href="https://netlib.org/lapack/explore-html-3.6.1/d7/d3b/group__double_g_esolve_ga1df516c81d3e902cca1fc79a7220b9cb.html#ga1df516c81d3e902cca1fc79a7220b9cb"><code>DGELS()</code></a> routine.</p>
-<div class="no-row-height column-margin column-container"><p><sup>34</sup>&nbsp; It is always possible to find an <span class="math inline">\(n-1\)</span> degree polynomial containing <span class="math inline">\(n\)</span> data points exactly. However, when <span class="math inline">\(n\)</span> is large the polynomial fluctuates wildly between successive data points. This problem is known as <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge’s phenomenon</a> and can be avoided by using <a href="https://en.wikipedia.org/wiki/Spline_interpolation">spline interpolation</a>.</p></div><div id="poly">
+<div class="no-row-height column-margin column-container"><div id="fn34"><p><sup>34</sup>&nbsp; It is always possible to find an <span class="math inline">\(n-1\)</span> degree polynomial containing <span class="math inline">\(n\)</span> data points exactly. However, when <span class="math inline">\(n\)</span> is large the polynomial fluctuates wildly between successive data points. This problem is known as <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge’s phenomenon</a> and can be avoided by using <a href="https://en.wikipedia.org/wiki/Spline_interpolation">spline interpolation</a>.</p></div></div><div id="poly">
 <iframe src="https://georgestagg.github.io/interpolating-polynomials-wasm/"></iframe>
 </div>
 </section>
@@ -1142,18 +1142,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1185,7 +1174,47 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/gws\.phd");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -1220,7 +1249,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');

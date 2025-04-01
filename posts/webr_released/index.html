@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2023-03-09">
 <meta name="description" content="WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.">
 
-<title>Dr George W Stagg - WebR 0.1.0 has been released</title>
+<title>WebR 0.1.0 has been released – Dr George W Stagg</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -109,11 +109,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Dr George W Stagg - WebR 0.1.0 has been released">
+<meta property="og:title" content="WebR 0.1.0 has been released – Dr George W Stagg">
 <meta property="og:description" content="WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.">
 <meta property="og:image" content="https://gws.phd/posts/webr_released/thumbnail.jpeg">
 <meta property="og:site_name" content="Dr George W Stagg">
-<meta name="twitter:title" content="Dr George W Stagg - WebR 0.1.0 has been released">
+<meta name="twitter:title" content="WebR 0.1.0 has been released – Dr George W Stagg">
 <meta name="twitter:description" content="WebR 0.1.0 has been released! Using the magic of WebAssembly, webR allows you to run R code directly within a web browser.">
 <meta name="twitter:image" content="https://gws.phd/posts/webr_released/thumbnail.jpeg">
 <meta name="twitter:creator" content="@gwstagg">
@@ -128,7 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
@@ -173,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
@@ -267,10 +267,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A web-based interactive R console is included in the webR source repository as a demonstration of integrating webR into a wider web application. A publicly accessible instance of the webR console can be found at <a href="https://webr.r-wasm.org/latest/" class="uri">https://webr.r-wasm.org/latest/</a>.</p>
 <p><a href="webr-repl.png" target="_blank"><img src="webr-repl.png" class="img-fluid" alt="A screenshot showing the demo webR console creating a plot"></a></p>
 <p>With the webR online console a new user can get up and running with R in seconds. The webR console is also functional on many modern mobile devices, where traditional versions of R are not always available for installation at all<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;I am aware of at least one early adopter using webR as a way to access R on their Apple iPad.</p></div><p>It’s possible to perform data analysis on reasonably large datasets by uploading data to a Virtual File System (VFS). The webR console provides an interface to view and interact with the VFS (<strong>Files</strong> tab, top right). Once a data file has been uploaded to the VFS it can be read by R like any standard file.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;I am aware of at least one early adopter using webR as a way to access R on their Apple iPad.</p></div></div><p>It’s possible to perform data analysis on reasonably large datasets by uploading data to a Virtual File System (VFS). The webR console provides an interface to view and interact with the VFS (<strong>Files</strong> tab, top right). Once a data file has been uploaded to the VFS it can be read by R like any standard file.</p>
 <p><a href="webr-repl2.png" target="_blank"><img src="webr-repl2.png" class="img-fluid" alt="A screenshot showing the demo webR console loading a data file"></a></p>
 <p>Note that uploading and downloading files to the VFS in this way does not actually involve transferring any data over the network. However, webR has been built so that it is possible to load data into webR over the network by using R’s built in functions that can download from URL, such as <code>read.csv()</code><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>2</sup>&nbsp;Note that there are some security measures in place when fetching data that are applied to all web applications. Downloading datasets from URL requires that the web server providing the data supports and allows <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">Cross Origin Resource Sharing (CORS)</a></p></div><p><a href="webr-repl3.png" target="_blank"><img src="webr-repl3.png" class="img-fluid" alt="A screenshot showing the demo webR console loading a data file from URL"></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Note that there are some security measures in place when fetching data that are applied to all web applications. Downloading datasets from URL requires that the web server providing the data supports and allows <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">Cross Origin Resource Sharing (CORS)</a></p></div></div><p><a href="webr-repl3.png" target="_blank"><img src="webr-repl3.png" class="img-fluid" alt="A screenshot showing the demo webR console loading a data file from URL"></a></p>
 <p>Plotting is also supported (<strong>Plotting</strong> tab, top right), meaning a user can produce beautiful plot output with the webR console, closing the loop of reading data, performing analysis, and producing output. It is entirely feasible that a casual user could perform the basics of data science entirely within their web browser using webR.</p>
 </section>
 <section id="an-educational-tool" class="level3">
@@ -447,7 +447,7 @@ hist(data, c = rainbow(12))`,
 <p>A core principle of good science is that results should be repeatable and reproducible by others. Unfortunately the misuse of data analysis, leading to unreliable results, <a href="https://en.wikipedia.org/wiki/Misuse_of_statistics">is a known issue</a>.</p>
 <p>The idea of a reproducible report is to bring the philosophy of repeatability to the delivery format itself. Reproducible reports weave together explanatory prose, data science, source code, output and figures; all in a single place with a consistent execution environment. With this, a user reading the report has everything they need to reproduce and confirm results for themselves.</p>
 <p>While Jupyter notebooks were not the first implementation of executable documents<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, their popularity has grown over the last decade or so as a way to support high quality reproducible reports. Jupyter has been named <a href="https://www.nature.com/articles/d41586-018-07196-1"><em>“The data scientists’ computational notebook of choice”</em></a> and almost 10 million Jupyter notebooks were publicly accessible on GitHub as of Oct 2020<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>3</sup>&nbsp;Knuth originally introduced the precursor <a href="https://en.wikipedia.org/wiki/Literate_programming">Literate Programming</a> paradigm in 1984, and more recently tools such as Sweave, knitr and RMarkdown enable embedding R and computational results directly into a report.</p><p><sup>4</sup>&nbsp;Admittedly, only a small proportion using an R kernel. <a href="https://blog.jetbrains.com/datalore/2020/12/17/we-downloaded-10-000-000-jupyter-notebooks-from-github-this-is-what-we-learned/">The overwhelming majority use Python, R comes second, and Julia third.</a></p></div><p>While a Jupyter notebook usually requires a Python and Jupyter installation to fully reproduce results, recent work by the <a href="https://jupyterlite.readthedocs.io/en/latest/">JupyterLite</a> team uses Wasm to bring Jupyter to the web browser. JupyterLite can be used with <a href="https://pyodide.org/en/stable/">Pyodide</a> to run Python based notebooks directly in the browser.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Knuth originally introduced the precursor <a href="https://en.wikipedia.org/wiki/Literate_programming">Literate Programming</a> paradigm in 1984, and more recently tools such as Sweave, knitr and RMarkdown enable embedding R and computational results directly into a report.</p></div><div id="fn4"><p><sup>4</sup>&nbsp;Admittedly, only a small proportion using an R kernel. <a href="https://blog.jetbrains.com/datalore/2020/12/17/we-downloaded-10-000-000-jupyter-notebooks-from-github-this-is-what-we-learned/">The overwhelming majority use Python, R comes second, and Julia third.</a></p></div></div><p>While a Jupyter notebook usually requires a Python and Jupyter installation to fully reproduce results, recent work by the <a href="https://jupyterlite.readthedocs.io/en/latest/">JupyterLite</a> team uses Wasm to bring Jupyter to the web browser. JupyterLite can be used with <a href="https://pyodide.org/en/stable/">Pyodide</a> to run Python based notebooks directly in the browser.</p>
 <p>WebR aims to provide that same experience for Jupyter notebooks based on R. As part of the initial release of webR, we are also releasing a <a href="https://github.com/r-wasm/jupyterlite-webr-kernel">webR kernel for JupyterLite</a>, allowing users to write and execute reproducible Jupyter notebooks for R directly in the web browser.</p>
 <p>A JupyterLite instance with the webR kernel available can be found at <a href="https://jupyter.r-wasm.org/" class="uri">https://jupyter.r-wasm.org/</a>, along with a sample R Jupyter notebook demonstrating a reproducible report.</p>
 <p><a href="jupyter.png" target="_blank"><img src="jupyter.png" class="img-fluid" alt="A screenshot showing the webR JupyterLite kernel"></a></p>
@@ -684,18 +684,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -727,7 +716,47 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/gws\.phd");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -762,7 +791,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2024-04-02">
 <meta name="description" content="WebR 0.3.1 is now available at npm, GitHub, and via CDN. Take a look at what’s new in this release.">
 
-<title>Dr George W Stagg - WebR 0.3.1 has been released</title>
+<title>WebR 0.3.1 has been released – Dr George W Stagg</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -109,11 +109,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Dr George W Stagg - WebR 0.3.1 has been released">
+<meta property="og:title" content="WebR 0.3.1 has been released – Dr George W Stagg">
 <meta property="og:description" content="WebR 0.3.1 is now available at npm, GitHub, and via CDN. Take a look at what’s new in this release.">
 <meta property="og:image" content="https://gws.phd/posts/webr_0.3.1/thumbnail.jpeg">
 <meta property="og:site_name" content="Dr George W Stagg">
-<meta name="twitter:title" content="Dr George W Stagg - WebR 0.3.1 has been released">
+<meta name="twitter:title" content="WebR 0.3.1 has been released – Dr George W Stagg">
 <meta name="twitter:description" content="WebR 0.3.1 is now available at npm, GitHub, and via CDN. Take a look at what’s new in this release.">
 <meta name="twitter:image" content="https://gws.phd/posts/webr_0.3.1/thumbnail.jpeg">
 <meta name="twitter:creator" content="@gwstagg">
@@ -128,7 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
@@ -173,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
@@ -270,7 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="evaluating-r-code-from-javascript" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="evaluating-r-code-from-javascript">Evaluating R code from JavaScript</h2>
 <p>The underlying interpreter powering webR is built from the same source code as R itself, with patches applied so that it can run in the WebAssembly environment. With this release, we have rebased our patches on the latest stable version of R<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. By keeping our source in sync, improvements and bug fixes made by the R Core Team also benefit any project making use of webR.</p>
-<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;The latest stable release at the time of writing: <a href="https://cran.rstudio.com/doc/manuals/r-release/NEWS.html">R 4.3.3 — “Angel Food Cake”</a></p></div><p>WebR’s core functionality is to evaluate R code from a JavaScript environment. As such, it is imperative that this works well, even with large and complex scripts. The <a href="https://webr.r-wasm.org/v0.3.1/">webR app</a> has been updated to better handle large R scripts, and scripts longer than 4096 characters should no longer cause strange issues in the R console.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;The latest stable release at the time of writing: <a href="https://cran.rstudio.com/doc/manuals/r-release/NEWS.html">R 4.3.3 — “Angel Food Cake”</a></p></div></div><p>WebR’s core functionality is to evaluate R code from a JavaScript environment. As such, it is imperative that this works well, even with large and complex scripts. The <a href="https://webr.r-wasm.org/v0.3.1/">webR app</a> has been updated to better handle large R scripts, and scripts longer than 4096 characters should no longer cause strange issues in the R console.</p>
 <section id="loading-webassembly-packages" class="level3">
 <h3 class="anchored" data-anchor-id="loading-webassembly-packages">Loading WebAssembly packages</h3>
 <p>The package management functions provided by webR have been expanded and improved. We set up webR with shims (interceptors) for <a href="https://rdrr.io/r/utils/install.packages.html"><code>install.packages()</code></a>, <a href="https://rdrr.io/r/base/library.html"><code>library()</code></a>, and <a href="https://rdrr.io/r/base/library.html"><code>require()</code></a> so that installing or loading R packages automatically downloads WebAssembly binaries from the <a href="https://repo.r-wasm.org">webR package repository</a>. Also, it is no longer required to run the <a href="https://rdrr.io/r/base/library.html"><code>library()</code></a> command a second time to subsequently load the package.</p>
@@ -745,7 +745,7 @@ Loading webR…
 <section id="llvm-flang" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="llvm-flang">LLVM Flang</h3>
 <p>To compile Fortran sources in the R source code<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> for webR, we require a Fortran compiler that supports outputting WebAssembly objects. This is a surprisingly tricky business, and our current solution is to maintain a patched version of LLVM’s <code>flang-new</code> compiler frontend.</p>
-<div class="no-row-height column-margin column-container"><p><sup>2</sup>&nbsp;There are also many R packages containing Fortran source code.</p></div><p>In recent months, the patches we must make to LLVM Flang have become smaller and easier to manage as the LLVM team continues to improve the Flang frontend. While too long for this post, for those interested in exactly what changes we make to enable WebAssembly output, I have written a deep-dive blog post, <a href="https://gws.phd/posts/fortran_wasm/">Fortran on WebAssembly</a>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;There are also many R packages containing Fortran source code.</p></div></div><p>In recent months, the patches we must make to LLVM Flang have become smaller and easier to manage as the LLVM team continues to improve the Flang frontend. While too long for this post, for those interested in exactly what changes we make to enable WebAssembly output, I have written a deep-dive blog post, <a href="https://gws.phd/posts/fortran_wasm/">Fortran on WebAssembly</a>.</p>
 </section>
 </section>
 <section id="additional-system-libraries-and-rust-support" class="level2">
@@ -759,7 +759,7 @@ Loading webR…
 <section id="webassembly-r-package-binaries" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="webassembly-r-package-binaries">WebAssembly R package binaries</h2>
 <p>With the introduction of additional system libraries and changes to the WebAssembly toolchain, the default webR package repository has also been refreshed. The repository tends to follow CRAN package releases, though is updated less frequently. <strong>19452</strong> WebAssembly R packages have been recompiled from source for this release, with <strong>12969</strong> packages, about 63% of CRAN, fully available<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> for use in webR.</p>
-<div class="no-row-height column-margin column-container"><p><sup>3</sup>&nbsp;Here “available” means that both a binary build of an R package and all of its dependencies can be downloaded from the repository.</p></div><p>As my usual caveat goes, we have not been able to test all the available packages. Feel free to try your favourite package in the <a href="https://webr.r-wasm.org/v0.3.1/">webR app</a> and let us know in a <a href="https://github.com/r-wasm/webr/issues">GitHub issue</a> if there is a problem.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Here “available” means that both a binary build of an R package and all of its dependencies can be downloaded from the repository.</p></div></div><p>As my usual caveat goes, we have not been able to test all the available packages. Feel free to try your favourite package in the <a href="https://webr.r-wasm.org/v0.3.1/">webR app</a> and let us know in a <a href="https://github.com/r-wasm/webr/issues">GitHub issue</a> if there is a problem.</p>
 <p>The <a href="https://repo.r-wasm.org">package repository index</a> contains further information and a searchable list of WebAssembly R packages. In addition, <a href="https://r-universe.dev">R-Universe</a> also builds webR-compatible binaries and so can be used as an alternative repository for access to even more R packages.</p>
 <section id="building-custom-webassembly-r-packages" class="level3">
 <h3 class="anchored" data-anchor-id="building-custom-webassembly-r-packages">Building custom WebAssembly R packages</h3>
@@ -956,18 +956,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -999,7 +988,47 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/gws\.phd");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -1034,7 +1063,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');

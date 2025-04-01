@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2023-08-16">
 <meta name="description" content="WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.">
 
-<title>Dr George W Stagg - WebR 0.2.0 has been released</title>
+<title>WebR 0.2.0 has been released – Dr George W Stagg</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -109,11 +109,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Dr George W Stagg - WebR 0.2.0 has been released">
+<meta property="og:title" content="WebR 0.2.0 has been released – Dr George W Stagg">
 <meta property="og:description" content="WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.">
 <meta property="og:image" content="https://gws.phd/posts/webr_0.2.0/thumbnail.jpeg">
 <meta property="og:site_name" content="Dr George W Stagg">
-<meta name="twitter:title" content="Dr George W Stagg - WebR 0.2.0 has been released">
+<meta name="twitter:title" content="WebR 0.2.0 has been released – Dr George W Stagg">
 <meta name="twitter:description" content="WebR 0.2.0 has been released. Updates and improvements to the webR REPL app, HTML canvas graphics device, internationalisation, Wasm R packages, Shiny support, and the developer API.">
 <meta name="twitter:image" content="https://gws.phd/posts/webr_0.2.0/thumbnail.jpeg">
 <meta name="twitter:creator" content="@gwstagg">
@@ -128,7 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
@@ -173,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
@@ -251,7 +251,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="webassembly-and-webr" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="webassembly-and-webr">WebAssembly and webR</h2>
 <p>My previous <a href="https://www.tidyverse.org/blog/2023/03/webr-0-1-0/">webR release blog post</a> goes into detail about what WebAssembly is, why people are excited about it, and how it relates to the R community and ecosystem in general through webR. I would recommend it as a good place to start, if the project is new to you<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;In addition, <a href="https://blog.djnavarro.net/posts/2023-04-09_webr/">Danielle Navarro’s webR blog post</a> is very good and Bob Rudis’s <a href="https://rud.is/webr-experiments/">webR experiments</a> are well worth exploring, along with his recent <a href="https://youtu.be/inpwcTUmBDY">NY R conference talk</a>.</p><p><sup>2</sup>&nbsp;Also other JavaScript/Wasm environments, such as Node.js. For example, <a href="https://ropensci.org/r-universe/">ROpenSci’s r-universe</a> package platform provides download links for datasets contained in R packages, in a variety of formats, <a href="https://fosstodon.org/@jeroenooms/110299179903212170">powered by running webR server-side in Node.js</a>.</p></div><p>A short explanation is that WebAssembly (also known as Wasm) allows software that’s normally compiled for a specific computer system to instead run anywhere, including in web browsers. Wasm is the technology that powers <a href="https://pyodide.org">Pyodide</a> (used by <a href="https://shiny.rstudio.com/py/docs/shinylive.html">Shinylive for Python</a>) and webR brings this technology to the R world. Using webR it is possible to run R code directly in a web browser<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, without the need for the traditional supporting R server to execute the code.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;In addition, <a href="https://blog.djnavarro.net/posts/2023-04-09_webr/">Danielle Navarro’s webR blog post</a> is very good and Bob Rudis’s <a href="https://rud.is/webr-experiments/">webR experiments</a> are well worth exploring, along with his recent <a href="https://youtu.be/inpwcTUmBDY">NY R conference talk</a>.</p></div><div id="fn2"><p><sup>2</sup>&nbsp;Also other JavaScript/Wasm environments, such as Node.js. For example, <a href="https://ropensci.org/r-universe/">ROpenSci’s r-universe</a> package platform provides download links for datasets contained in R packages, in a variety of formats, <a href="https://fosstodon.org/@jeroenooms/110299179903212170">powered by running webR server-side in Node.js</a>.</p></div></div><p>A short explanation is that WebAssembly (also known as Wasm) allows software that’s normally compiled for a specific computer system to instead run anywhere, including in web browsers. Wasm is the technology that powers <a href="https://pyodide.org">Pyodide</a> (used by <a href="https://shiny.rstudio.com/py/docs/shinylive.html">Shinylive for Python</a>) and webR brings this technology to the R world. Using webR it is possible to run R code directly in a web browser<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, without the need for the traditional supporting R server to execute the code.</p>
 <p>Running R code directly in a browser opens the door for many new and exciting uses for R on the web. Applications that I’m personally excited in seeing developed are,</p>
 <ul>
 <li>Live and interactive R code and graphics in documents &amp; presentations,</li>
@@ -348,7 +348,7 @@ Loading webR…
 <section id="the-webr-repl-app" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-webr-repl-app">The webR REPL app</h2>
 <p>WebR can be loaded into a web page to be used as a part of a wider web application, and ships with a demo application that does just that. The webR REPL app<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> provides a simple R environment directly in your web browser. The app can be accessed at <a href="https://webr.r-wasm.org/v0.2.0/" class="uri">https://webr.r-wasm.org/v0.2.0/</a> and includes sections for R console input/output, code editing, file management, and graphics device output.</p>
-<div class="no-row-height column-margin column-container"><p><sup>3</sup>&nbsp;REPL stands for “Read, Eval, Print, Loop”, and is another name for the R console that you’re probably familiar with. The application is named the “webR REPL app” because the original version simply provided the user with a fullscreen R console in their web browser.</p></div><p>With the webR REPL app, a casual user could get up and running with R in seconds, without having to install any software on their machine. It is entirely feasible that they could perform the basics of data science entirely within their web browser!</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;REPL stands for “Read, Eval, Print, Loop”, and is another name for the R console that you’re probably familiar with. The application is named the “webR REPL app” because the original version simply provided the user with a fullscreen R console in their web browser.</p></div></div><p>With the webR REPL app, a casual user could get up and running with R in seconds, without having to install any software on their machine. It is entirely feasible that they could perform the basics of data science entirely within their web browser!</p>
 <p>Other than interactive code blocks, like in the example earlier, the webR REPL app is perhaps the first thing that users new to webR will interact with. For this reason, we have spent some time working to improve the technical implementation and user experience of using the app. The app has been completely rewritten in the React web framework, replacing the older jQuery library. This allows for better component code organisation and more rapid development of features and updates.</p>
 <p><a href="repl.png"><img alt="A screenshot the webR REPL app. The code to generate a ggplot, along with its output, is shown in the app." width="95%" src="repl.png"></a></p>
 <section id="code-editor" class="level3">
@@ -487,7 +487,7 @@ Loading webR…
   }
 </script>
 <p>Any system font available to the web browser can now be used<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. As well as a nice-to-have, this also provides improved accessibility. For example, there are fonts designed specifically for use by readers with dyslexia and other similar reading barriers<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> that could be used for drawing text in plots.</p>
-<div class="no-row-height column-margin column-container"><p><sup>4</sup>&nbsp;This also includes the world of CSS web fonts, but it is a little tricky. <a href="https://stackoverflow.com/a/53808942">Extra work</a> must be done so that the font is available to the Web Worker. Probably this can be handled better in a future release of <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a>.</p><p><sup>5</sup>&nbsp;<a href="https://www.dyslexiefont.com">Dyslexie</a>, <a href="https://opendyslexic.org">Open Dyslexic</a>. Results of research in this area is mixed, but even if these fonts don’t improve the speed of text comprehension, some users may simply prefer or feel more comfortable with them.</p></div><p>Font metrics are now exact, using <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/measureText"><code>measureText()</code></a>, rather than estimating the width and height of Latin glyphs using heuristics. This gives more accurate positioning of rendered text and improves the general quality of resulting plots.</p>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;This also includes the world of CSS web fonts, but it is a little tricky. <a href="https://stackoverflow.com/a/53808942">Extra work</a> must be done so that the font is available to the Web Worker. Probably this can be handled better in a future release of <a href="https://docs.r-wasm.org/webr/latest/api/r.html#graphics-device-for-drawing-to-a-html-canvas-element"><code>webr::canvas()</code></a>.</p></div><div id="fn5"><p><sup>5</sup>&nbsp;<a href="https://www.dyslexiefont.com">Dyslexie</a>, <a href="https://opendyslexic.org">Open Dyslexic</a>. Results of research in this area is mixed, but even if these fonts don’t improve the speed of text comprehension, some users may simply prefer or feel more comfortable with them.</p></div></div><p>Font metrics are now exact, using <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/measureText"><code>measureText()</code></a>, rather than estimating the width and height of Latin glyphs using heuristics. This gives more accurate positioning of rendered text and improves the general quality of resulting plots.</p>
 <p>Support for Unicode, font glyph fallback, complex ligatures, and right-to-left (RTL) text have all been improved. This vastly improves results when rendering text for international users, particularly for non-Latin RTL scripts such as the Arabic and Hebrew text in the example above.</p>
 <p>Also, colour emoji can now be added to plots. 😃</p>
 </section>
@@ -566,7 +566,7 @@ Loading webR…
 <p>This is a high price to pay in time and bandwidth when not every user is going to need every feature. A similar principle also applies to other files included with R by default. It’s nice that all the default R documentation, examples, and datasets are available on the VFS, but we don’t necessarily need those files downloaded every time to every client machine.</p>
 <p>With webR 0.2.0 a “lazy” virtual filesystem mechanism, powered by <a href="https://emscripten.org/docs/porting/files/Synchronous-Virtual-XHR-Backed-File-System-Usage.html">a feature of Emscripten’s FS API</a>, is introduced. With this, only the files required to launch R and use the default packages are downloaded at initialisation time. Additional files provided on the VFS are still available for use, but they are only downloaded from the remote server when they are requested in some way by the running Wasm R process.</p>
 <p>With the introduction of the lazy virtual filesystem, along with other efficiency improvements, the initial download size for webR is now much smaller, a great improvement.</p>
-<table class="table">
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Component</th>
@@ -620,7 +620,7 @@ Loading webR…
 <p>Using features new to webR 0.2.0, a <a href="https://github.com/r-wasm/httpuv">httpuv webR package shim</a> has been created that provides the functionality usually provided by the <a href="https://cran.r-project.org/web/packages/httpuv/index.html">httpuv</a> R package. The package enables R to handle HTTP and WebSocket traffic, and is a prerequisite for the R Shiny package.</p>
 <p>The shim works by taking advantage of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API">JavaScript Service Worker API</a>. Normally Service Workers are used to implement fast offline caching of web content, but they can also be used as a general network proxy. The httpuv shim makes use of a Service Worker to intercept network traffic from a running Shiny web client, and forward that traffic to be handled by an instance of webR.</p>
 <p>From the Shiny server’s point of view, it is communicating with the usual httpuv package using its R API. From the point of view of the Shiny web client, it is talking to a Shiny server over the network. Between the two, the JavaScript Service Worker and webR work together to act as a network proxy and handle the traffic entirely within the client<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><p><sup>6</sup>&nbsp;<a href="https://shiny.posit.co/py/docs/shinylive.html">Shinylive for Python</a> also uses a JavaScript Service Worker scheme to serve fully client-side apps.</p></div><p><a href="httpuv.png"><img alt="A block diagram showing how the httpuv shim, webR worker thread, and Shiny work together. See the preceding diagram for an explanation of how the blocks interact" width="90%" src="httpuv.png"></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;<a href="https://shiny.posit.co/py/docs/shinylive.html">Shinylive for Python</a> also uses a JavaScript Service Worker scheme to serve fully client-side apps.</p></div></div><p><a href="httpuv.png"><img alt="A block diagram showing how the httpuv shim, webR worker thread, and Shiny work together. See the preceding diagram for an explanation of how the blocks interact" width="90%" src="httpuv.png"></a></p>
 <p>The httpuv shim package is still in the experimental stage, but it is currently available for testing and is included in our public webR package repository.</p>
 <section id="an-example-shiny-app" class="level3">
 <h3 class="anchored" data-anchor-id="an-example-shiny-app">An example shiny app</h3>
@@ -952,18 +952,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -995,7 +984,47 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/gws\.phd");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -1030,7 +1059,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
