@@ -18,5 +18,5 @@ about:
       href: mailto:george@stagg.phd
 ---
 
-Senior Software Engineer @ Posit Software, PBC.\
+Principal Software Engineer @ Posit Software, PBC.\
 Lead Developer of the [webR](https://docs.r-wasm.org/webr/latest/) project.
